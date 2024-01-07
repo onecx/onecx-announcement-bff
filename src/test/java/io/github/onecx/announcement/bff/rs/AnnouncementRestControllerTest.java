@@ -27,7 +27,7 @@ import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 @TestHTTPEndpoint(AnnouncementRestController.class)
-public class AnnouncementRestControllerTest extends AbstractTest {
+class AnnouncementRestControllerTest extends AbstractTest {
 
     private static final String ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH = "/internal/announcements";
 
@@ -119,7 +119,7 @@ public class AnnouncementRestControllerTest extends AbstractTest {
         Assertions.assertNotNull(response);
         Assertions.assertEquals(data.getNumber(), response.getNumber());
         Assertions.assertEquals(data.getSize(), response.getSize());
-        Assertions.assertEquals(data.getStream().size(), 1);
+        Assertions.assertEquals(1, data.getStream().size());
         Assertions.assertEquals(data.getStream().get(0), announcement);
     }
 
@@ -191,7 +191,7 @@ public class AnnouncementRestControllerTest extends AbstractTest {
 
         // Assertions
         Assertions.assertNotNull(response);
-        Assertions.assertEquals(response.getAppIds().size(), 2);
+        Assertions.assertEquals(2, response.getAppIds().size());
         Assertions.assertEquals(response.getAppIds(), data.getAppIds());
 
     }
@@ -306,5 +306,40 @@ public class AnnouncementRestControllerTest extends AbstractTest {
                 .statusCode(Response.Status.BAD_REQUEST.getStatusCode())
                 .extract().as(ProblemDetailResponseDTO.class);
 
+    }
+
+    @Test
+    void addAnnouncements_shouldReturnBadRequest_whenRunningIntoValidationConstraints() {
+
+        ProblemDetailResponse data = new ProblemDetailResponse();
+        data.setErrorCode("CONSTRAINT_VIOLATIONS");
+        data.setDetail(
+                "createProduct.arg0.name: must not be null");
+        List<ProblemDetailInvalidParam> list = new ArrayList<>();
+        ProblemDetailInvalidParam param1 = new ProblemDetailInvalidParam();
+        param1.setName("createProduct.arg0.name");
+        param1.setMessage("must not be null");
+        list.add(param1);
+        data.setParams(null);
+        data.setInvalidParams(list);
+
+        mockServerClient.when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH).withMethod(HttpMethod.POST))
+                .withPriority(100)
+                .respond(httpRequest -> response().withStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withBody(JsonBody.json(data)));
+
+        CreateAnnouncementRequestDTO emptyRequestDTO;
+
+        var response = given()
+                .when()
+                .contentType(APPLICATION_JSON)
+                .post()
+                .then()
+                .statusCode(Response.Status.BAD_REQUEST.getStatusCode())
+                .contentType(APPLICATION_JSON)
+                .extract().as(ProblemDetailResponseDTO.class);
+
+        Assertions.assertNotNull(response);
     }
 }
