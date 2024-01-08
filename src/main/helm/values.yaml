@@ -1,0 +1,6 @@
+app:
+  image:
+    repository: "onecx/onecx-announcement-bff"
+    tag: 999-SNAPSHOT
+  db:
+    enabled: true
