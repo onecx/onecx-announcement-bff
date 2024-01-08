@@ -19,7 +19,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SearchAnnouncementRequest'
+              $ref: '#/components/schemas/AnnouncementSearchCriteria'
       responses:
         "200":
           description: OK
@@ -343,3 +343,36 @@ components:
           type: string
         message:
           type: string
+    AnnouncementSearchCriteria:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        type:
+          $ref: '#/components/schemas/AnnouncementType'
+        priority:
+          $ref: '#/components/schemas/AnnouncementPriorityType'
+        status:
+          $ref: '#/components/schemas/AnnouncementStatus'
+        startDateFrom:
+          $ref: '#/components/schemas/OffsetDateTime'
+        startDateTo:
+          $ref: '#/components/schemas/OffsetDateTime'
+        endDateFrom:
+          $ref: '#/components/schemas/OffsetDateTime'
+        endDateTo:
+          $ref: '#/components/schemas/OffsetDateTime'
+        appId:
+          type: string
+        pageNumber:
+          format: int32
+          description: The number of page.
+          default: 0
+          type: integer
+        pageSize:
+          format: int32
+          description: The size of page
+          default: 100
+          type: integer

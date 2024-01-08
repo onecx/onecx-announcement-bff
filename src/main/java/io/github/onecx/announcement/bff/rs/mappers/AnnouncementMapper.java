@@ -14,7 +14,7 @@ public interface AnnouncementMapper {
 
     UpdateAnnouncementRequest mapUpdateAnnouncement(UpdateAnnouncementRequestDTO updateAnnouncementRequestDTO);
 
-    AnnouncementSearchCriteria mapAnnouncementSearchCriteria(SearchAnnouncementRequestDTO searchAnnouncementRequestDTO);
+    AnnouncementSearchCriteria mapAnnouncementSearchCriteria(AnnouncementSearchCriteriaDTO searchAnnouncementRequestDTO);
 
     @Mapping(target = "version", ignore = true)
     AnnouncementDTO mapAnnouncementToAnnouncementDTO(Announcement announcement);

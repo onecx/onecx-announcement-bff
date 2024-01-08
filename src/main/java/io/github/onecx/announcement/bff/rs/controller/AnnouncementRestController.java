@@ -78,10 +78,10 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     }
 
     @Override
-    public Response getAnnouncements(SearchAnnouncementRequestDTO searchAnnouncementRequestDTO) {
+    public Response getAnnouncements(AnnouncementSearchCriteriaDTO announcementSearchCriteriaDTO) {
 
         try (Response response = client
-                .getAnnouncements(announcementMapper.mapAnnouncementSearchCriteria(searchAnnouncementRequestDTO))) {
+                .getAnnouncements(announcementMapper.mapAnnouncementSearchCriteria(announcementSearchCriteriaDTO))) {
             AnnouncementPageResult announcementPageResult = response.readEntity(AnnouncementPageResult.class);
             AnnouncementPageResultDTO announcementPageResultDTO = announcementMapper
                     .mapAnnouncementPageResultToAnnouncementPageResultDTO(announcementPageResult);
