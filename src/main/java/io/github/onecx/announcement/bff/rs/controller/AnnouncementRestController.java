@@ -39,7 +39,7 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     ExceptionMapper exceptionMapper;
 
     @Override
-    public Response addAnnouncement(CreateAnnouncementRequestDTO createAnnouncementRequestDTO) {
+    public Response createAnnouncement(CreateAnnouncementRequestDTO createAnnouncementRequestDTO) {
 
         try (Response response = client
                 .createAnnouncement(announcementMapper.mapCreateAnnouncement(createAnnouncementRequestDTO))) {

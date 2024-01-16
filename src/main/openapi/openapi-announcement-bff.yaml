@@ -26,6 +26,7 @@ paths:
           content:
             application/json:
               schema:
+                type: array
                 items:
                   $ref: '#/components/schemas/AnnouncementPageResult'
         "400":
@@ -38,8 +39,8 @@ paths:
     post:
       tags:
         - AnnouncementInternal
-      summary: Add announcement
-      operationId: addAnnouncement
+      summary: Create announcement
+      operationId: createAnnouncement
       requestBody:
         required: true
         content:
@@ -111,12 +112,6 @@ paths:
       responses:
         "204":
           description: No content
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetailResponse'
     put:
       tags:
         - AnnouncementInternal
@@ -129,6 +124,7 @@ paths:
           schema:
             type: string
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -157,6 +153,9 @@ components:
             type: string
     CreateAnnouncementRequest:
       type: object
+      required:
+        - title
+        - startDate
       properties:
         title:
           type: string
@@ -174,23 +173,9 @@ components:
           $ref: '#/components/schemas/OffsetDateTime'
         appId:
           type: string
-    SearchAnnouncementRequest:
+    AnnouncementSearchCriteria:
       type: object
       properties:
-        creationDateFrom:
-          $ref: '#/components/schemas/OffsetDateTime'
-        creationDateTo:
-          $ref: '#/components/schemas/OffsetDateTime'
-        creationUser:
-          type: string
-        modificationDateFrom:
-          $ref: '#/components/schemas/OffsetDateTime'
-        modificationDateTo:
-          $ref: '#/components/schemas/OffsetDateTime'
-        modificationUser:
-          type: string
-        id:
-          type: string
         title:
           type: string
         content:
@@ -223,6 +208,9 @@ components:
           type: integer
     UpdateAnnouncementRequest:
       type: object
+      required:
+        - title
+        - startDate
       properties:
         title:
           type: string
@@ -243,7 +231,7 @@ components:
     Announcement:
       type: object
       properties:
-        version:
+        modificationCount:
           format: int32
           type: integer
         creationDate:
@@ -342,36 +330,3 @@ components:
           type: string
         message:
           type: string
-    AnnouncementSearchCriteria:
-      type: object
-      properties:
-        title:
-          type: string
-        content:
-          type: string
-        type:
-          $ref: '#/components/schemas/AnnouncementType'
-        priority:
-          $ref: '#/components/schemas/AnnouncementPriorityType'
-        status:
-          $ref: '#/components/schemas/AnnouncementStatus'
-        startDateFrom:
-          $ref: '#/components/schemas/OffsetDateTime'
-        startDateTo:
-          $ref: '#/components/schemas/OffsetDateTime'
-        endDateFrom:
-          $ref: '#/components/schemas/OffsetDateTime'
-        endDateTo:
-          $ref: '#/components/schemas/OffsetDateTime'
-        appId:
-          type: string
-        pageNumber:
-          format: int32
-          description: The number of page.
-          default: 0
-          type: integer
-        pageSize:
-          format: int32
-          description: The size of page
-          default: 100
-          type: integer

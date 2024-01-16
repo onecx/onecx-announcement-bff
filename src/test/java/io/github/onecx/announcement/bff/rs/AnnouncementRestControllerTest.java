@@ -5,6 +5,7 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.JsonBody;
 import org.mockserver.model.MediaType;
+import org.tkit.quarkus.rs.mappers.OffsetDateTimeMapper;
 
 import gen.io.github.onecx.announcement.bff.clients.model.*;
 import gen.io.github.onecx.announcement.bff.rs.internal.model.*;
@@ -40,12 +42,16 @@ class AnnouncementRestControllerTest extends AbstractTest {
     }
 
     @Test
-    void addAnnouncement_shouldReturnAnnouncement() {
+    void createAnnouncement_shouldReturnAnnouncement() {
+        var offsetDateTime = OffsetDateTime.parse("2023-11-30T13:53:03.688710200+01:00");
+        OffsetDateTimeMapper offsetDateTimeMapper = new OffsetDateTimeMapper();
 
         // Request data to svc
         Announcement data = new Announcement();
         data.setAppId("appId");
         data.setContent("AnnouncmentContent");
+        data.setTitle("announcementTitle");
+        data.startDate(offsetDateTime);
 
         // svc call prepare mock endpoint
         mockServerClient
@@ -59,6 +65,8 @@ class AnnouncementRestControllerTest extends AbstractTest {
         // bff call input
         CreateAnnouncementRequestDTO input = new CreateAnnouncementRequestDTO();
         input.setAppId("appId1");
+        input.setTitle("announcementTitle");
+        input.startDate(offsetDateTime);
 
         // bff call
         var response = given()
@@ -79,6 +87,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
 
     @Test
     void getAnnouncements_shouldReturnAnnouncementPageResults() {
+
         Announcement announcement = new Announcement();
         announcement.setAppId("appId");
         announcement.setContent("AnnouncmentContent");
@@ -252,6 +261,9 @@ class AnnouncementRestControllerTest extends AbstractTest {
 
     @Test
     void updateAnnouncementById() {
+        var offsetDateTime = OffsetDateTime.parse("2023-11-30T13:53:03.688710200+01:00");
+        OffsetDateTimeMapper offsetDateTimeMapper = new OffsetDateTimeMapper();
+
         String updateId = "updateId_NO_CONTENT";
         Announcement data = new Announcement();
         data.setAppId("appIdTest1");
@@ -267,6 +279,8 @@ class AnnouncementRestControllerTest extends AbstractTest {
                                 .withBody(JsonBody.json(data)));
 
         UpdateAnnouncementRequestDTO input = new UpdateAnnouncementRequestDTO();
+        input.setStartDate(offsetDateTime);
+        input.setTitle("appTitle");
         // bff call
         given()
                 .when()
@@ -309,7 +323,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
     }
 
     @Test
-    void addAnnouncements_shouldReturnBadRequest_whenRunningIntoValidationConstraints() {
+    void createAnnouncement_shouldReturnBadRequest_whenRunningIntoValidationConstraints() {
 
         ProblemDetailResponse data = new ProblemDetailResponse();
         data.setErrorCode("CONSTRAINT_VIOLATIONS");
