@@ -16,7 +16,6 @@ public interface AnnouncementMapper {
 
     AnnouncementSearchCriteria mapAnnouncementSearchCriteria(AnnouncementSearchCriteriaDTO searchAnnouncementRequestDTO);
 
-    @Mapping(target = "version", ignore = true)
     AnnouncementDTO mapAnnouncementToAnnouncementDTO(Announcement announcement);
 
     @Mapping(target = "removeStreamItem", ignore = true)

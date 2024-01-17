@@ -14,7 +14,6 @@ import org.tkit.quarkus.log.cdi.LogService;
 
 import gen.io.github.onecx.announcement.bff.clients.api.AnnouncementInternalApi;
 import gen.io.github.onecx.announcement.bff.clients.model.*;
-import gen.io.github.onecx.announcement.bff.clients.model.ProblemDetailResponse;
 import gen.io.github.onecx.announcement.bff.rs.internal.AnnouncementInternalApiService;
 import gen.io.github.onecx.announcement.bff.rs.internal.model.*;
 import io.github.onecx.announcement.bff.rs.mappers.AnnouncementMapper;
@@ -40,7 +39,7 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     ExceptionMapper exceptionMapper;
 
     @Override
-    public Response addAnnouncement(CreateAnnouncementRequestDTO createAnnouncementRequestDTO) {
+    public Response createAnnouncement(CreateAnnouncementRequestDTO createAnnouncementRequestDTO) {
 
         try (Response response = client
                 .createAnnouncement(announcementMapper.mapCreateAnnouncement(createAnnouncementRequestDTO))) {
@@ -97,11 +96,6 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
             Announcement announcement = response.readEntity(Announcement.class);
             AnnouncementDTO announcementDTO = announcementMapper.mapAnnouncementToAnnouncementDTO(announcement);
             return Response.status(response.getStatus()).entity(announcementDTO).build();
-        } catch (WebApplicationException ex) {
-            return Response.status(ex.getResponse().getStatus())
-                    .entity(problemDetailMapper
-                            .mapProblemDetailResponse(ex.getResponse().readEntity(ProblemDetailResponse.class)))
-                    .build();
         }
     }
 
