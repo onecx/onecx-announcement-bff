@@ -1,4 +1,4 @@
-package io.github.onecx.announcement.bff.rs;
+package org.tkit.onecx.announcement.bff.rs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

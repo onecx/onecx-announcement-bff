@@ -1,11 +1,11 @@
-package io.github.onecx.announcement.bff.rs.mappers;
+package org.tkit.onecx.announcement.bff.rs.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.tkit.quarkus.rs.mappers.OffsetDateTimeMapper;
 
-import gen.io.github.onecx.announcement.bff.clients.model.ProblemDetailResponse;
-import gen.io.github.onecx.announcement.bff.rs.internal.model.ProblemDetailResponseDTO;
+import gen.org.tkit.onecx.announcement.bff.clients.model.ProblemDetailResponse;
+import gen.org.tkit.onecx.announcement.bff.rs.internal.model.ProblemDetailResponseDTO;
 
 @Mapper(uses = { OffsetDateTimeMapper.class })
 public interface ProblemDetailMapper {

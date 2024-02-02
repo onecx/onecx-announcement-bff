@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.github.onecx</groupId>
+        <groupId>org.tkit.onecx</groupId>
         <artifactId>onecx-quarkus3-parent</artifactId>
-        <version>0.25.0</version>
+        <version>0.31.0</version>
     </parent>
 
     <artifactId>onecx-announcement-bff</artifactId>
@@ -54,10 +54,7 @@
             <groupId>org.tkit.quarkus.lib</groupId>
             <artifactId>tkit-quarkus-rest</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.tkit.quarkus.lib</groupId>
-            <artifactId>tkit-quarkus-jpa</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
@@ -66,10 +63,7 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-validator</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-health</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-opentelemetry</artifactId>
@@ -78,6 +72,7 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
         </dependency>
+
         <!-- DEV -->
         <dependency>
             <groupId>io.quarkiverse.mockserver</groupId>
@@ -117,8 +112,8 @@
                         </goals>
                         <configuration>
                             <inputSpec>src/main/openapi/openapi-announcement-bff.yaml</inputSpec>
-                            <apiPackage>gen.io.github.onecx.announcement.bff.rs.internal</apiPackage>
-                            <modelPackage>gen.io.github.onecx.announcement.bff.rs.internal.model</modelPackage>
+                            <apiPackage>gen.org.tkit.onecx.announcement.bff.rs.internal</apiPackage>
+                            <modelPackage>gen.org.tkit.onecx.announcement.bff.rs.internal.model</modelPackage>
                         </configuration>
                     </execution>
                 </executions>
