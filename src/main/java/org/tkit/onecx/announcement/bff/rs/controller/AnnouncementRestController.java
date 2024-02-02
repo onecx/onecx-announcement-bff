@@ -1,4 +1,4 @@
-package io.github.onecx.announcement.bff.rs.controller;
+package org.tkit.onecx.announcement.bff.rs.controller;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -10,15 +10,15 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
+import org.tkit.onecx.announcement.bff.rs.mappers.AnnouncementMapper;
+import org.tkit.onecx.announcement.bff.rs.mappers.ExceptionMapper;
+import org.tkit.onecx.announcement.bff.rs.mappers.ProblemDetailMapper;
 import org.tkit.quarkus.log.cdi.LogService;
 
-import gen.io.github.onecx.announcement.bff.clients.api.AnnouncementInternalApi;
-import gen.io.github.onecx.announcement.bff.clients.model.*;
-import gen.io.github.onecx.announcement.bff.rs.internal.AnnouncementInternalApiService;
-import gen.io.github.onecx.announcement.bff.rs.internal.model.*;
-import io.github.onecx.announcement.bff.rs.mappers.AnnouncementMapper;
-import io.github.onecx.announcement.bff.rs.mappers.ExceptionMapper;
-import io.github.onecx.announcement.bff.rs.mappers.ProblemDetailMapper;
+import gen.org.tkit.onecx.announcement.bff.clients.api.AnnouncementInternalApi;
+import gen.org.tkit.onecx.announcement.bff.clients.model.*;
+import gen.org.tkit.onecx.announcement.bff.rs.internal.AnnouncementInternalApiService;
+import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
 
 @ApplicationScoped
 @Transactional(value = Transactional.TxType.NOT_SUPPORTED)
