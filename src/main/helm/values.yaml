@@ -4,3 +4,13 @@ app:
     repository: "onecx/onecx-announcement-bff"
   db:
     enabled: true
+  operator:
+    # Permission
+    permission:
+      enabled: true
+      spec:
+        permissions:
+          announcements:
+            read: permission on all GET requests and POST search
+            write: permission on PUT, POST, PATCH requests, where objects are saved or updated
+            delete: permission on all DELETE requests
