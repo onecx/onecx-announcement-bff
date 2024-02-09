@@ -21,8 +21,8 @@ import org.mockserver.model.MediaType;
 import org.tkit.onecx.announcement.bff.rs.controller.AnnouncementRestController;
 import org.tkit.quarkus.rs.mappers.OffsetDateTimeMapper;
 
-import gen.org.tkit.onecx.announcement.bff.clients.model.*;
 import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
+import gen.org.tkit.onecx.announcement.client.model.*;
 import io.quarkiverse.mockserver.test.InjectMockServerClient;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
