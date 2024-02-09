@@ -12,17 +12,16 @@ import java.util.List;
 import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.core.Response;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.JsonBody;
 import org.mockserver.model.MediaType;
 import org.tkit.onecx.announcement.bff.rs.controller.AnnouncementRestController;
-import org.tkit.quarkus.rs.mappers.OffsetDateTimeMapper;
 
-import gen.org.tkit.onecx.announcement.bff.clients.model.*;
 import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
+import gen.org.tkit.onecx.announcement.client.model.*;
 import io.quarkiverse.mockserver.test.InjectMockServerClient;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
@@ -36,15 +35,20 @@ class AnnouncementRestControllerTest extends AbstractTest {
     @InjectMockServerClient
     MockServerClient mockServerClient;
 
-    @AfterEach
-    void resetMockserver() {
-        mockServerClient.reset();
+    static final String mockId = "MOCK";
+
+    @BeforeEach
+    void resetExpectation() {
+        try {
+            mockServerClient.clear(mockId);
+        } catch (Exception ex) {
+            //  mockId not existing
+        }
     }
 
     @Test
     void createAnnouncement_shouldReturnAnnouncement() {
         var offsetDateTime = OffsetDateTime.parse("2023-11-30T13:53:03.688710200+01:00");
-        OffsetDateTimeMapper offsetDateTimeMapper = new OffsetDateTimeMapper();
 
         // Request data to svc
         Announcement data = new Announcement();
@@ -57,7 +61,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
         mockServerClient
                 .when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH)
                         .withMethod(HttpMethod.POST))
-                .withPriority(100)
+                .withId(mockId)
                 .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withBody(JsonBody.json(data)));
@@ -68,9 +72,22 @@ class AnnouncementRestControllerTest extends AbstractTest {
         input.setTitle("announcementTitle");
         input.startDate(offsetDateTime);
 
+        // standard USER get FORBIDDEN with only READ permission
+        given()
+                .when()
+                .auth().oauth2(keycloakClient.getAccessToken(USER))
+                .header(APM_HEADER_PARAM, USER)
+                .contentType(APPLICATION_JSON)
+                .body(input)
+                .post()
+                .then()
+                .statusCode(Response.Status.FORBIDDEN.getStatusCode());
+
         // bff call
         var response = given()
                 .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
                 .contentType(APPLICATION_JSON)
                 .body(input)
                 .post()
@@ -105,7 +122,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
         mockServerClient
                 .when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/search")
                         .withMethod(HttpMethod.POST))
-                .withPriority(100)
+                .withId(mockId)
                 .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withBody(JsonBody.json(data)));
@@ -116,6 +133,8 @@ class AnnouncementRestControllerTest extends AbstractTest {
         // bff call
         var response = given()
                 .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
                 .contentType(APPLICATION_JSON)
                 .body(input)
                 .post("/search")
@@ -143,7 +162,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request()
                         .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/1")
                         .withMethod(HttpMethod.GET))
-                .withPriority(100)
+                .withId(mockId)
                 .respond(
                         httpRequest -> response()
                                 .withStatusCode(Response.Status.OK.getStatusCode())
@@ -153,6 +172,8 @@ class AnnouncementRestControllerTest extends AbstractTest {
         // bff call
         var response = given()
                 .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
                 .contentType(APPLICATION_JSON)
                 .get("/1")
                 .then()
@@ -179,7 +200,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request()
                         .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/appIds")
                         .withMethod(HttpMethod.GET))
-                .withPriority(100)
+                .withId(mockId)
                 .respond(
                         httpRequest -> response()
                                 .withStatusCode(Response.Status.OK.getStatusCode())
@@ -191,6 +212,8 @@ class AnnouncementRestControllerTest extends AbstractTest {
         // bff call
         var response = given()
                 .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
                 .contentType(APPLICATION_JSON)
                 .get("/appIds")
                 .then()
@@ -217,7 +240,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request()
                         .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/" + idNotFound)
                         .withMethod(HttpMethod.GET))
-                .withPriority(100)
+                .withId(mockId)
                 .respond(
                         httpRequest -> response()
                                 .withStatusCode(Response.Status.NOT_FOUND.getStatusCode())
@@ -226,6 +249,8 @@ class AnnouncementRestControllerTest extends AbstractTest {
         // bff call
         given()
                 .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
                 .contentType(APPLICATION_JSON)
                 .get(idNotFound)
                 .then()
@@ -242,7 +267,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request()
                         .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/" + deleteId)
                         .withMethod(HttpMethod.DELETE))
-                .withPriority(100)
+                .withId(mockId)
                 .respond(
                         httpRequest -> response()
                                 .withStatusCode(Response.Status.NO_CONTENT.getStatusCode()));
@@ -250,6 +275,8 @@ class AnnouncementRestControllerTest extends AbstractTest {
         // bff call
         var response = given()
                 .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
                 .contentType(APPLICATION_JSON)
                 .delete(deleteId)
                 .then()
@@ -262,7 +289,6 @@ class AnnouncementRestControllerTest extends AbstractTest {
     @Test
     void updateAnnouncementById() {
         var offsetDateTime = OffsetDateTime.parse("2023-11-30T13:53:03.688710200+01:00");
-        OffsetDateTimeMapper offsetDateTimeMapper = new OffsetDateTimeMapper();
 
         String updateId = "updateId_NO_CONTENT";
         Announcement data = new Announcement();
@@ -272,7 +298,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request()
                         .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/" + updateId)
                         .withMethod(HttpMethod.PUT))
-                .withPriority(100)
+                .withId(mockId)
                 .respond(
                         httpRequest -> response()
                                 .withStatusCode(Response.Status.OK.getStatusCode())
@@ -281,9 +307,12 @@ class AnnouncementRestControllerTest extends AbstractTest {
         UpdateAnnouncementRequestDTO input = new UpdateAnnouncementRequestDTO();
         input.setStartDate(offsetDateTime);
         input.setTitle("appTitle");
+        input.setModificationCount(0);
         // bff call
         given()
                 .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
                 .contentType(APPLICATION_JSON)
                 .body(input)
                 .put(updateId)
@@ -302,7 +331,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request()
                         .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/" + updateId)
                         .withMethod(HttpMethod.PUT))
-                .withPriority(100)
+                .withId(mockId)
                 .respond(
                         httpRequest -> response()
                                 .withStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
@@ -313,6 +342,8 @@ class AnnouncementRestControllerTest extends AbstractTest {
         // bff call
         given()
                 .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
                 .contentType(APPLICATION_JSON)
                 .body(input)
                 .put(updateId)
@@ -338,15 +369,15 @@ class AnnouncementRestControllerTest extends AbstractTest {
         data.setInvalidParams(list);
 
         mockServerClient.when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH).withMethod(HttpMethod.POST))
-                .withPriority(100)
+                .withId(mockId)
                 .respond(httpRequest -> response().withStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withBody(JsonBody.json(data)));
 
-        CreateAnnouncementRequestDTO emptyRequestDTO;
-
         var response = given()
                 .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
                 .contentType(APPLICATION_JSON)
                 .post()
                 .then()

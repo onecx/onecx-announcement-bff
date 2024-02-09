@@ -54,7 +54,10 @@
             <groupId>org.tkit.quarkus.lib</groupId>
             <artifactId>tkit-quarkus-rest</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.tkit.quarkus.lib</groupId>
+            <artifactId>tkit-quarkus-rest-context</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
@@ -71,6 +74,22 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.tkit.onecx.quarkus</groupId>
+            <artifactId>onecx-permissions</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-oidc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-oidc-client-reactive-filter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.tkit.quarkus.lib</groupId>
+            <artifactId>tkit-quarkus-security</artifactId>
         </dependency>
 
         <!-- DEV -->
@@ -97,6 +116,11 @@
             <artifactId>swagger-parser</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-test-keycloak-server</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -118,6 +142,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <additionalProperties>onecx-permissions=true</additionalProperties>
                     <generatorName>jaxrs-spec</generatorName>
                     <apiNameSuffix>ApiService</apiNameSuffix>
                     <modelNameSuffix>DTO</modelNameSuffix>

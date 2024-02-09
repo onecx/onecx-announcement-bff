@@ -10,6 +10,10 @@ tags:
 paths:
   /announcements/search:
     post:
+      x-onecx:
+        permissions:
+          announcements:
+            - read
       tags:
         - AnnouncementInternal
       summary: Find announcements by criteria
@@ -37,6 +41,10 @@ paths:
                 $ref: '#/components/schemas/ProblemDetailResponse'
   /announcements:
     post:
+      x-onecx:
+        permissions:
+          announcements:
+            - write
       tags:
         - AnnouncementInternal
       summary: Create announcement
@@ -68,6 +76,10 @@ paths:
                 $ref: '#/components/schemas/ProblemDetailResponse'
   /announcements/appIds:
     get:
+      x-onecx:
+        permissions:
+          announcements:
+            - read
       tags:
         - AnnouncementInternal
       summary: Get all application IDs to which announcements are assigned
@@ -81,6 +93,10 @@ paths:
                 $ref: '#/components/schemas/AnnouncementApps'
   /announcements/{id}:
     get:
+      x-onecx:
+        permissions:
+          announcements:
+            - read
       tags:
         - AnnouncementInternal
       summary: Retrieve announcement by id
@@ -99,6 +115,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Announcement'
     delete:
+      x-onecx:
+        permissions:
+          announcements:
+            - delete
       tags:
         - AnnouncementInternal
       summary: Delete announcement
@@ -113,6 +133,10 @@ paths:
         "204":
           description: No content
     put:
+      x-onecx:
+        permissions:
+          announcements:
+            - write
       tags:
         - AnnouncementInternal
       summary: Patch/update announcement
@@ -211,7 +235,11 @@ components:
       required:
         - title
         - startDate
+        - modificationCount
       properties:
+        modificationCount:
+          format: int32
+          type: integer
         title:
           type: string
         content:
