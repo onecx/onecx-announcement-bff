@@ -166,12 +166,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetailResponse'
+  /announcements/workspaces:
+    get:
+      x-onecx:
+        permissions:
+          announcements:
+            - read
+      tags:
+        - AnnouncementInternal
+      summary: retrieve list of all existing workspace names
+      operationId: getAllWorkspaceNames
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
 components:
   schemas:
     AnnouncementApps:
       type: object
       properties:
         appIds:
+          type: array
+          items:
+            type: string
+        workspaceNames:
           type: array
           items:
             type: string
@@ -197,6 +220,8 @@ components:
           $ref: '#/components/schemas/OffsetDateTime'
         appId:
           type: string
+        workspaceName:
+          type: string
     AnnouncementSearchCriteria:
       type: object
       properties:
@@ -219,6 +244,8 @@ components:
         endDateTo:
           $ref: '#/components/schemas/OffsetDateTime'
         appId:
+          type: string
+        workspaceName:
           type: string
         pageNumber:
           format: int32
@@ -256,6 +283,8 @@ components:
           $ref: '#/components/schemas/OffsetDateTime'
         appId:
           type: string
+        workspaceName:
+          type: string
     Announcement:
       type: object
       properties:
@@ -287,6 +316,8 @@ components:
         endDate:
           $ref: '#/components/schemas/OffsetDateTime'
         appId:
+          type: string
+        workspaceName:
           type: string
     AnnouncementPageResult:
       type: object
