@@ -89,7 +89,7 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     }
 
     @Override
-    public Response getAnnouncements(AnnouncementSearchCriteriaDTO announcementSearchCriteriaDTO) {
+    public Response searchAnnouncements(AnnouncementSearchCriteriaDTO announcementSearchCriteriaDTO) {
 
         try (Response response = client
                 .getAnnouncements(announcementMapper.mapAnnouncementSearchCriteria(announcementSearchCriteriaDTO))) {
