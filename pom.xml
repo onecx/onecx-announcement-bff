@@ -178,16 +178,31 @@
                         <goals>
                             <goal>wget</goal>
                         </goals>
+                        <configuration>
+                            <url>
+                                https://raw.githubusercontent.com/onecx/onecx-announcement-svc/main/src/main/openapi/announcement-openapi-internal.yaml
+                            </url>
+                            <outputDirectory>target/tmp/openapi</outputDirectory>
+                            <outputFileName>onecx-announcement-svc.yaml</outputFileName>
+                            <skipCache>true</skipCache>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>workspace-v1</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://raw.githubusercontent.com/onecx/onecx-workspace-svc/main/src/main/openapi/onecx-workspace-v1-openapi.yaml
+                            </url>
+                            <outputDirectory>target/tmp/openapi</outputDirectory>
+                            <outputFileName>onecx-workspace-svc-v1.yaml</outputFileName>
+                            <skipCache>true</skipCache>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <url>
-                        https://raw.githubusercontent.com/onecx/onecx-announcement-svc/main/src/main/openapi/announcement-openapi-internal.yaml
-                    </url>
-                    <outputDirectory>target/tmp/openapi</outputDirectory>
-                    <outputFileName>onecx-announcement-svc.yaml</outputFileName>
-                    <skipCache>true</skipCache>
-                </configuration>
             </plugin>
         </plugins>
     </build>

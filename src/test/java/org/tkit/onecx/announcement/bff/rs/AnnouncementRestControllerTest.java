@@ -7,7 +7,9 @@ import static org.mockserver.model.HttpResponse.response;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.core.Response;
@@ -386,5 +388,32 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .extract().as(ProblemDetailResponseDTO.class);
 
         Assertions.assertNotNull(response);
+    }
+
+    @Test
+    void getAllWorkspaceNames() {
+        Set<String> workspaceNames = new HashSet<>();
+        workspaceNames.add("testWorkspace");
+        // create mock rest endpoint
+        mockServerClient
+                .when(request().withPath("/v1/workspaces")
+                        .withMethod(HttpMethod.GET))
+                .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withBody(JsonBody.json(workspaceNames)));
+
+        var response = given()
+                .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
+                .contentType(APPLICATION_JSON)
+                .get("/workspaces")
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .contentType(APPLICATION_JSON)
+                .extract().as(HashSet.class);
+
+        Assertions.assertNotNull(response);
+        Assertions.assertTrue(response.contains("testWorkspace"));
     }
 }
