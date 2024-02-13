@@ -1,5 +1,7 @@
 package org.tkit.onecx.announcement.bff.rs.controller;
 
+import java.util.HashSet;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -12,13 +14,13 @@ import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 import org.tkit.onecx.announcement.bff.rs.mappers.AnnouncementMapper;
 import org.tkit.onecx.announcement.bff.rs.mappers.ExceptionMapper;
-import org.tkit.onecx.announcement.bff.rs.mappers.ProblemDetailMapper;
 import org.tkit.quarkus.log.cdi.LogService;
 
 import gen.org.tkit.onecx.announcement.bff.rs.internal.AnnouncementInternalApiService;
 import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
 import gen.org.tkit.onecx.announcement.client.api.AnnouncementInternalApi;
 import gen.org.tkit.onecx.announcement.client.model.*;
+import gen.org.tkit.onecx.workspace.client.api.WorkspaceExternalApi;
 
 @ApplicationScoped
 @Transactional(value = Transactional.TxType.NOT_SUPPORTED)
@@ -30,10 +32,11 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     AnnouncementInternalApi client;
 
     @Inject
-    AnnouncementMapper announcementMapper;
+    @RestClient
+    WorkspaceExternalApi workspaceClient;
 
     @Inject
-    ProblemDetailMapper problemDetailMapper;
+    AnnouncementMapper announcementMapper;
 
     @Inject
     ExceptionMapper exceptionMapper;
@@ -67,6 +70,15 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     }
 
     @Override
+    public Response getAllWorkspaceNames() {
+        HashSet<String> workspaceNames = new HashSet<>();
+        try (Response response = workspaceClient.getAllWorkspaceNames()) {
+            workspaceNames = response.readEntity(HashSet.class);
+        }
+        return Response.status(Response.Status.OK).entity(workspaceNames).build();
+    }
+
+    @Override
     public Response getAnnouncementById(String id) {
 
         try (Response response = client.getAnnouncementById(id)) {
@@ -77,7 +89,7 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     }
 
     @Override
-    public Response getAnnouncements(AnnouncementSearchCriteriaDTO announcementSearchCriteriaDTO) {
+    public Response searchAnnouncements(AnnouncementSearchCriteriaDTO announcementSearchCriteriaDTO) {
 
         try (Response response = client
                 .getAnnouncements(announcementMapper.mapAnnouncementSearchCriteria(announcementSearchCriteriaDTO))) {
