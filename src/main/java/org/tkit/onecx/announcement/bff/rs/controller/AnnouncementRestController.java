@@ -1,6 +1,6 @@
 package org.tkit.onecx.announcement.bff.rs.controller;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -21,6 +21,8 @@ import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
 import gen.org.tkit.onecx.announcement.client.api.AnnouncementInternalApi;
 import gen.org.tkit.onecx.announcement.client.model.*;
 import gen.org.tkit.onecx.workspace.client.api.WorkspaceExternalApi;
+import gen.org.tkit.onecx.workspace.client.model.WorkspacePageResult;
+import gen.org.tkit.onecx.workspace.client.model.WorkspaceSearchCriteria;
 
 @ApplicationScoped
 @Transactional(value = Transactional.TxType.NOT_SUPPORTED)
@@ -71,9 +73,10 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
 
     @Override
     public Response getAllWorkspaceNames() {
-        HashSet<String> workspaceNames = new HashSet<>();
-        try (Response response = workspaceClient.getAllWorkspaceNames()) {
-            workspaceNames = response.readEntity(HashSet.class);
+        Set<String> workspaceNames;
+        try (Response response = workspaceClient.searchWorkspaces(new WorkspaceSearchCriteria())) {
+            var result = response.readEntity(WorkspacePageResult.class);
+            workspaceNames = announcementMapper.workspaceNames(result);
         }
         return Response.status(Response.Status.OK).entity(workspaceNames).build();
     }
