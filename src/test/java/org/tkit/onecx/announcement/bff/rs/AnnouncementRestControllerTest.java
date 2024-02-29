@@ -9,7 +9,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.core.Response;
@@ -24,6 +23,8 @@ import org.tkit.onecx.announcement.bff.rs.controller.AnnouncementRestController;
 
 import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
 import gen.org.tkit.onecx.announcement.client.model.*;
+import gen.org.tkit.onecx.workspace.client.model.WorkspaceAbstract;
+import gen.org.tkit.onecx.workspace.client.model.WorkspacePageResult;
 import io.quarkiverse.mockserver.test.InjectMockServerClient;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
@@ -392,15 +393,17 @@ class AnnouncementRestControllerTest extends AbstractTest {
 
     @Test
     void getAllWorkspaceNames() {
-        Set<String> workspaceNames = new HashSet<>();
-        workspaceNames.add("testWorkspace");
+
+        var result = new WorkspacePageResult().stream(List.of(
+                new WorkspaceAbstract().name("testWorkspace").description("testWorkspace")));
+
         // create mock rest endpoint
         mockServerClient
-                .when(request().withPath("/v1/workspaces")
-                        .withMethod(HttpMethod.GET))
+                .when(request().withPath("/v1/workspaces/search")
+                        .withMethod(HttpMethod.POST))
                 .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
                         .withContentType(MediaType.APPLICATION_JSON)
-                        .withBody(JsonBody.json(workspaceNames)));
+                        .withBody(JsonBody.json(result)));
 
         var response = given()
                 .when()
