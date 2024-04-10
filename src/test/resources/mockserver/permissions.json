@@ -15,7 +15,7 @@
         "json": {
           "appId": "onecx-announcement-bff",
           "permissions": {
-            "announcements": [
+            "announcement": [
               "read",
               "write",
               "delete"
@@ -46,7 +46,7 @@
         "json": {
           "appId": "onecx-announcement-bff",
           "permissions": {
-            "announcements": [
+            "announcement": [
               "read"
             ],
             "permissions": [

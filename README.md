@@ -1,2 +1,2 @@
 # onecx-announcement-bff
-OneCx Announcement BFF
+OneCX Announcement BFF
