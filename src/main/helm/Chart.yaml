@@ -2,7 +2,7 @@ apiVersion: v2
 name: onecx-announcement-bff
 version: 0.0.0
 appVersion: 0.0.0
-description: Onecx announcement bff
+description: OneCX Announcement BFF
 keywords:
   - announcement
 sources:

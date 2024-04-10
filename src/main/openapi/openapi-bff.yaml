@@ -12,7 +12,7 @@ paths:
     post:
       x-onecx:
         permissions:
-          announcements:
+          announcement:
             - read
       tags:
         - AnnouncementInternal
@@ -41,7 +41,7 @@ paths:
     post:
       x-onecx:
         permissions:
-          announcements:
+          announcement:
             - write
       tags:
         - AnnouncementInternal
@@ -76,7 +76,7 @@ paths:
     get:
       x-onecx:
         permissions:
-          announcements:
+          announcement:
             - read
       tags:
         - AnnouncementInternal
@@ -93,7 +93,7 @@ paths:
     get:
       x-onecx:
         permissions:
-          announcements:
+          announcement:
             - read
       tags:
         - AnnouncementInternal
@@ -115,7 +115,7 @@ paths:
     delete:
       x-onecx:
         permissions:
-          announcements:
+          announcement:
             - delete
       tags:
         - AnnouncementInternal
@@ -133,7 +133,7 @@ paths:
     put:
       x-onecx:
         permissions:
-          announcements:
+          announcement:
             - write
       tags:
         - AnnouncementInternal
@@ -168,7 +168,7 @@ paths:
     get:
       x-onecx:
         permissions:
-          announcements:
+          announcement:
             - read
       tags:
         - AnnouncementInternal
