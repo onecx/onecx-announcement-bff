@@ -92,6 +92,42 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     }
 
     @Override
+    public Response searchActiveAnnouncements(ActiveAnnouncementsSearchCriteriaDTO activeAnnouncementsSearchCriteriaDTO) {
+        var searchCriteria = announcementMapper.mapActiveAnnouncementSearchCriteria(activeAnnouncementsSearchCriteriaDTO);
+        searchCriteria.setPageSize(100);
+        searchCriteria.setPageNumber(0);
+        try (Response response = client
+                .getAnnouncements(searchCriteria)) {
+            AnnouncementPageResult announcementPageResult = response.readEntity(AnnouncementPageResult.class);
+            ActiveAnnouncementsPageResultDTO announcementPageResultDTO = announcementMapper
+                    .mapAnnouncementPageResultToActiveAnnouncementPageResultDTO(announcementPageResult);
+            if (searchCriteria.getWorkspaceName() == null) {
+                announcementPageResultDTO.setStream(announcementPageResultDTO.getStream().stream().filter(
+                        announcementAbstractDTO -> announcementAbstractDTO.getWorkspaceName() == null).toList());
+            }
+
+            //get global announcements
+            if (searchCriteria.getWorkspaceName() != null) {
+                searchCriteria.setWorkspaceName(null);
+                AnnouncementPageResult announcementPageResult2;
+                ActiveAnnouncementsPageResultDTO announcementPageResultDTO2;
+                try (Response response2 = client
+                        .getAnnouncements(searchCriteria)) {
+                    announcementPageResult2 = response2.readEntity(AnnouncementPageResult.class);
+                    announcementPageResultDTO2 = announcementMapper
+                            .mapAnnouncementPageResultToActiveAnnouncementPageResultDTO(announcementPageResult2);
+                    announcementPageResultDTO2.setStream(announcementPageResultDTO2.getStream().stream()
+                            .filter(announcementAbstractDTO -> announcementAbstractDTO.getWorkspaceName() == null).toList());
+                }
+                announcementPageResultDTO = announcementMapper.merge(announcementPageResultDTO, announcementPageResultDTO2,
+                        activeAnnouncementsSearchCriteriaDTO);
+            }
+
+            return Response.status(response.getStatus()).entity(announcementPageResultDTO).build();
+        }
+    }
+
+    @Override
     public Response searchAnnouncements(AnnouncementSearchCriteriaDTO announcementSearchCriteriaDTO) {
 
         try (Response response = client
@@ -116,13 +152,11 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
 
     @ServerExceptionMapper
     public RestResponse<ProblemDetailResponseDTO> constraint(ConstraintViolationException ex) {
-
         return exceptionMapper.constraint(ex);
     }
 
     @ServerExceptionMapper
     public Response restException(WebApplicationException ex) {
-
         return Response.status(ex.getResponse().getStatus()).build();
     }
 }

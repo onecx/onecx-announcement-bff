@@ -419,4 +419,132 @@ class AnnouncementRestControllerTest extends AbstractTest {
         Assertions.assertNotNull(response);
         Assertions.assertTrue(response.contains("testWorkspace"));
     }
+
+    @Test
+    void searchActiveAnnouncements_shouldReturnAnnouncementPageResults() {
+
+        Announcement a1 = new Announcement();
+        a1.setAppId("appId");
+        a1.setContent("AnnouncmentContent");
+        a1.setPriority(AnnouncementPriorityType.IMPORTANT);
+        a1.setTitle("A1");
+        a1.setWorkspaceName("w1");
+        a1.setStartDate(OffsetDateTime.parse("2024-04-11T10:09:24-04:00"));
+        a1.setEndDate(OffsetDateTime.parse("2024-04-25T10:09:24-04:00"));
+        Announcement a2 = new Announcement();
+        a2.setAppId("appId");
+        a2.setContent("AnnouncmentContent");
+        a2.setPriority(AnnouncementPriorityType.NORMAL);
+        a2.setTitle("A2");
+        a2.setWorkspaceName("w1");
+        a2.setStartDate(OffsetDateTime.parse("2024-04-11T10:09:24-04:00"));
+        a2.setEndDate(OffsetDateTime.parse("2024-04-25T10:09:24-04:00"));
+        Announcement a3 = new Announcement();
+        a3.setAppId("appId");
+        a3.setContent("AnnouncmentContent");
+        a3.setPriority(AnnouncementPriorityType.IMPORTANT);
+        a3.setTitle("A3");
+        a3.setWorkspaceName(null);
+        a3.setStartDate(OffsetDateTime.parse("2024-04-11T10:09:24-04:00"));
+        a3.setEndDate(OffsetDateTime.parse("2024-04-25T10:09:24-04:00"));
+        Announcement a4 = new Announcement();
+        a4.setAppId("appId");
+        a4.setContent("Shouldn't be returned");
+        a4.setPriority(AnnouncementPriorityType.IMPORTANT);
+        a4.setTitle("A4");
+        a4.setWorkspaceName("w2");
+        a4.setStartDate(OffsetDateTime.parse("2024-04-11T10:09:24-04:00"));
+        a4.setEndDate(OffsetDateTime.parse("2024-04-25T10:09:24-04:00"));
+        List<Announcement> announcements = new ArrayList<>();
+        announcements.add(a1);
+        announcements.add(a2);
+
+        List<Announcement> announcements2 = new ArrayList<>();
+        announcements2.add(a3);
+        announcements2.add(a4);
+
+        // Request data to svc
+        AnnouncementPageResult data = new AnnouncementPageResult();
+        data.setSize(2);
+        data.setTotalPages(1L);
+        data.setNumber(0);
+        data.setStream(announcements);
+
+        AnnouncementPageResult data2 = new AnnouncementPageResult();
+        data2.setSize(1);
+        data2.setTotalPages(1L);
+        data2.setNumber(0);
+        data2.setStream(announcements2);
+
+        AnnouncementSearchCriteria criteria1 = new AnnouncementSearchCriteria();
+        criteria1.setWorkspaceName("w1");
+        AnnouncementSearchCriteria criteria2 = new AnnouncementSearchCriteria();
+
+        // svc call prepare mock endpoint
+        mockServerClient
+                .when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/search")
+                        .withBody(JsonBody.json(criteria1))
+                        .withMethod(HttpMethod.POST))
+                .withId(mockId)
+                .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withBody(JsonBody.json(data)));
+
+        mockServerClient
+                .when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/search")
+                        .withBody(JsonBody.json(criteria2))
+                        .withMethod(HttpMethod.POST))
+                .withId("mock2")
+                .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withBody(JsonBody.json(data2)));
+
+        // bff call input
+        ActiveAnnouncementsSearchCriteriaDTO input = new ActiveAnnouncementsSearchCriteriaDTO();
+        input.setWorkspaceName("w1");
+        input.setCurrentDate(OffsetDateTime.parse("2024-04-24T12:15:50-04:00"));
+
+        // bff call
+        var response = given()
+                .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
+                .contentType(APPLICATION_JSON)
+                .body(input)
+                .post("/active/search")
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .contentType(APPLICATION_JSON)
+                .extract().as(AnnouncementPageResult.class);
+
+        // Assertions
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(response.getStream().size(), 3);
+        Assertions.assertEquals(response.getStream().get(0).getPriority(), AnnouncementPriorityType.IMPORTANT);
+        Assertions.assertNull(response.getStream().get(0).getWorkspaceName());
+        Assertions.assertEquals(response.getStream().get(1).getPriority(), AnnouncementPriorityType.IMPORTANT);
+        Assertions.assertEquals(response.getStream().get(1).getWorkspaceName(), "w1");
+
+        Assertions.assertEquals(response.getStream().get(2).getPriority(), AnnouncementPriorityType.NORMAL);
+        //only globals
+        ActiveAnnouncementsSearchCriteriaDTO input2 = new ActiveAnnouncementsSearchCriteriaDTO();
+        input2.setCurrentDate(OffsetDateTime.parse("2024-04-24T12:15:50-04:00"));
+        var responseOnlyGlobals = given()
+                .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
+                .contentType(APPLICATION_JSON)
+                .body(input2)
+                .post("/active/search")
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .contentType(APPLICATION_JSON)
+                .extract().as(AnnouncementPageResult.class);
+
+        Assertions.assertNotNull(responseOnlyGlobals);
+        Assertions.assertEquals(responseOnlyGlobals.getStream().size(), 1);
+        Assertions.assertEquals(responseOnlyGlobals.getStream().get(0).getTitle(), "A3");
+
+        mockServerClient.clear("mock2");
+    }
 }
