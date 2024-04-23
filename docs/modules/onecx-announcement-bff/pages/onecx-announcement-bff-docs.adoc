@@ -1,0 +1,68 @@
+
+include::onecx-announcement-bff-attributes.adoc[opts=optional]
+
+=== Default properties
+
+.{properties-file}
+[%collapsible%open]
+====
+[source,properties,subs=attributes+]
+----
+quarkus.http.auth.permission.health.paths=/q/*
+quarkus.http.auth.permission.health.policy=permit
+quarkus.http.auth.permission.default.paths=/*
+quarkus.http.auth.permission.default.policy=authenticated
+onecx.permissions.application-id=${quarkus.application.name}
+org.eclipse.microprofile.rest.client.propagateHeaders=apm-principal-token
+%prod.quarkus.rest-client.onecx_announcement_svc.url=http://onecx-announcement-svc:8080
+%prod.quarkus.rest-client.onecx_workspace_svc_v1.url=http://onecx-workspace-svc:8080
+%prod.quarkus.oidc-client.client-id=${quarkus.application.name}
+quarkus.openapi-generator.codegen.input-base-dir=target/tmp/openapi
+quarkus.openapi-generator.codegen.spec.onecx_announcement_svc_yaml.config-key=onecx_announcement_svc
+quarkus.openapi-generator.codegen.spec.onecx_announcement_svc_yaml.base-package=gen.org.tkit.onecx.announcement.client
+quarkus.openapi-generator.codegen.spec.onecx_announcement_svc_yaml.return-response=true
+quarkus.openapi-generator.codegen.spec.onecx_announcement_svc.additional-api-type-annotations=@org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
+quarkus.openapi-generator.codegen.spec.onecx_announcement_svc.additional-model-type-annotations=@io.quarkus.runtime.annotations.RegisterForReflection;
+quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.config-key=onecx_workspace_svc_v1
+quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.base-package=gen.org.tkit.onecx.workspace.client
+quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.return-response=true
+quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.additional-api-type-annotations=@org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
+quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.additional-model-type-annotations=@io.quarkus.runtime.annotations.RegisterForReflection;
+onecx.permissions.product-name=application
+----
+====
+
+=== Extensions
+
+include::onecx-announcement-bff-extensions.adoc[opts=optional]
+
+=== Container
+
+{docker-registry}[Docker registry]
+
+
+=== Helm
+
+{helm-registry}[Helm registry]
+
+Default values
+
+.{helm-file}
+[source,yaml]
+----
+app:
+  name: bff
+  image:
+    repository: "onecx/onecx-announcement-bff"
+  operator:
+    # Permission
+    permission:
+      enabled: true
+      spec:
+        permissions:
+          announcement:
+            read: permission on all GET requests and POST search
+            write: permission on PUT, POST, PATCH requests, where objects are saved or updated
+            delete: permission on all DELETE requests
+----
+
