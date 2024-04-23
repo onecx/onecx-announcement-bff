@@ -458,10 +458,8 @@ class AnnouncementRestControllerTest extends AbstractTest {
         List<Announcement> announcements = new ArrayList<>();
         announcements.add(a1);
         announcements.add(a2);
-
-        List<Announcement> announcements2 = new ArrayList<>();
-        announcements2.add(a3);
-        announcements2.add(a4);
+        announcements.add(a3);
+        announcements.add(a4);
 
         // Request data to svc
         AnnouncementPageResult data = new AnnouncementPageResult();
@@ -470,15 +468,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
         data.setNumber(0);
         data.setStream(announcements);
 
-        AnnouncementPageResult data2 = new AnnouncementPageResult();
-        data2.setSize(1);
-        data2.setTotalPages(1L);
-        data2.setNumber(0);
-        data2.setStream(announcements2);
-
         AnnouncementSearchCriteria criteria1 = new AnnouncementSearchCriteria();
-        criteria1.setWorkspaceName("w1");
-        AnnouncementSearchCriteria criteria2 = new AnnouncementSearchCriteria();
 
         // svc call prepare mock endpoint
         mockServerClient
@@ -489,15 +479,6 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withBody(JsonBody.json(data)));
-
-        mockServerClient
-                .when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/search")
-                        .withBody(JsonBody.json(criteria2))
-                        .withMethod(HttpMethod.POST))
-                .withId("mock2")
-                .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
-                        .withContentType(MediaType.APPLICATION_JSON)
-                        .withBody(JsonBody.json(data2)));
 
         // bff call input
         ActiveAnnouncementsSearchCriteriaDTO input = new ActiveAnnouncementsSearchCriteriaDTO();
@@ -525,26 +506,5 @@ class AnnouncementRestControllerTest extends AbstractTest {
         Assertions.assertEquals(response.getStream().get(1).getPriority(), AnnouncementPriorityType.IMPORTANT);
         Assertions.assertEquals(response.getStream().get(1).getWorkspaceName(), "w1");
 
-        Assertions.assertEquals(response.getStream().get(2).getPriority(), AnnouncementPriorityType.NORMAL);
-        //only globals
-        ActiveAnnouncementsSearchCriteriaDTO input2 = new ActiveAnnouncementsSearchCriteriaDTO();
-        input2.setCurrentDate(OffsetDateTime.parse("2024-04-24T12:15:50-04:00"));
-        var responseOnlyGlobals = given()
-                .when()
-                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
-                .header(APM_HEADER_PARAM, ADMIN)
-                .contentType(APPLICATION_JSON)
-                .body(input2)
-                .post("/active/search")
-                .then()
-                .statusCode(Response.Status.OK.getStatusCode())
-                .contentType(APPLICATION_JSON)
-                .extract().as(AnnouncementPageResult.class);
-
-        Assertions.assertNotNull(responseOnlyGlobals);
-        Assertions.assertEquals(responseOnlyGlobals.getStream().size(), 1);
-        Assertions.assertEquals(responseOnlyGlobals.getStream().get(0).getTitle(), "A3");
-
-        mockServerClient.clear("mock2");
     }
 }

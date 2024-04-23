@@ -44,6 +44,7 @@ public interface AnnouncementMapper {
     @Mapping(target = "endDateFrom", source = "currentDate")
     @Mapping(target = "content", ignore = true)
     @Mapping(target = "appId", ignore = true)
+    @Mapping(target = "workspaceName", ignore = true)
     AnnouncementSearchCriteria mapActiveAnnouncementSearchCriteria(
             ActiveAnnouncementsSearchCriteriaDTO activeAnnouncementsSearchCriteriaDTO);
 
@@ -51,48 +52,55 @@ public interface AnnouncementMapper {
     ActiveAnnouncementsPageResultDTO mapAnnouncementPageResultToActiveAnnouncementPageResultDTO(
             AnnouncementPageResult announcementPageResult);
 
-    default ActiveAnnouncementsPageResultDTO merge(ActiveAnnouncementsPageResultDTO announcementPageResultDTO,
-            ActiveAnnouncementsPageResultDTO announcementUnassignedPageResultDTO,
-            ActiveAnnouncementsSearchCriteriaDTO searchCriteria) {
-        var mergedWithoutDuplicates = new HashSet<AnnouncementAbstractDTO>();
-        mergedWithoutDuplicates.addAll(announcementPageResultDTO.getStream().stream().toList());
-        if (!announcementUnassignedPageResultDTO.getStream().isEmpty()) {
-            mergedWithoutDuplicates.addAll(announcementUnassignedPageResultDTO.getStream().stream().toList());
-        }
-
-        ActiveAnnouncementsPageResultDTO mergedResult = new ActiveAnnouncementsPageResultDTO();
-        mergedResult.setTotalElements((long) mergedWithoutDuplicates.size());
-        mergedResult.setStream(sort(mergedWithoutDuplicates.stream().toList()));
-        mergedResult.setNumber(searchCriteria.getPageNumber());
-        mergedResult.setSize(searchCriteria.getPageSize());
-        mergedResult.setTotalPages(1L);
-        if (mergedResult.getTotalElements() / mergedResult.getSize() > 0) {
-            mergedResult.setTotalPages(mergedResult.getTotalElements() / mergedResult.getSize());
-        }
-        int startIndex = 0;
-        int endIndex = Math.toIntExact(mergedResult.getTotalElements());
-        if (searchCriteria.getPageNumber() != 0) {
-            startIndex = (searchCriteria.getPageSize() * searchCriteria.getPageNumber());
-            endIndex = startIndex + searchCriteria.getPageSize() - 1;
-        }
-        if (searchCriteria.getPageSize() != 100) {
-            endIndex = startIndex + searchCriteria.getPageSize();
-        }
-        if (!(startIndex > mergedResult.getStream().size())) {
-            mergedResult.setStream(
-                    mergedResult.getStream().subList(startIndex, Math.min(endIndex, mergedResult.getStream().size())));
-        } else {
-            mergedResult.setStream(new ArrayList<>());
-        }
-
-        return mergedResult;
-    }
-
     default List<AnnouncementAbstractDTO> sort(List<AnnouncementAbstractDTO> mergedResult) {
         List<AnnouncementAbstractDTO> sortedList = new ArrayList<>(mergedResult);
         sortedList.sort(Comparator.comparing(AnnouncementAbstractDTO::getPriority)
                 .thenComparing((AnnouncementAbstractDTO item) -> item.getWorkspaceName() == null ? 0 : 1)
                 .thenComparing(AnnouncementAbstractDTO::getTitle));
         return sortedList;
+    }
+
+    default ActiveAnnouncementsPageResultDTO filterAndSort(ActiveAnnouncementsPageResultDTO announcementPageResultDTO,
+            ActiveAnnouncementsSearchCriteriaDTO activeAnnouncementsSearchCriteriaDTO) {
+        ActiveAnnouncementsPageResultDTO pageResult = new ActiveAnnouncementsPageResultDTO();
+
+        if (activeAnnouncementsSearchCriteriaDTO.getWorkspaceName() != null) {
+            pageResult.setStream(announcementPageResultDTO.getStream().stream()
+                    .filter(announcementAbstractDTO -> announcementAbstractDTO.getWorkspaceName() == null
+                            || announcementAbstractDTO.getWorkspaceName().equals(activeAnnouncementsSearchCriteriaDTO
+                                    .getWorkspaceName()))
+                    .toList());
+        } else {
+            pageResult.setStream(announcementPageResultDTO.getStream().stream()
+                    .filter(announcementAbstractDTO -> announcementAbstractDTO.getWorkspaceName() == null).toList());
+        }
+        //remove duplicates
+        HashSet<AnnouncementAbstractDTO> set = new HashSet<>(pageResult.getStream());
+        pageResult.setStream(sort(set.stream().toList()));
+
+        pageResult.setTotalElements((long) pageResult.getStream().size());
+        pageResult.setNumber(activeAnnouncementsSearchCriteriaDTO.getPageNumber());
+        pageResult.setSize(activeAnnouncementsSearchCriteriaDTO.getPageSize());
+        pageResult.setTotalPages(1L);
+        if (pageResult.getTotalElements() / pageResult.getSize() > 0) {
+            pageResult.setTotalPages(pageResult.getTotalElements() / pageResult.getSize());
+        }
+        int startIndex = 0;
+        int endIndex = Math.toIntExact(pageResult.getTotalElements());
+        if (activeAnnouncementsSearchCriteriaDTO.getPageNumber() != 0) {
+            startIndex = (activeAnnouncementsSearchCriteriaDTO.getPageSize()
+                    * activeAnnouncementsSearchCriteriaDTO.getPageNumber());
+            endIndex = startIndex + activeAnnouncementsSearchCriteriaDTO.getPageSize() - 1;
+        }
+        if (activeAnnouncementsSearchCriteriaDTO.getPageSize() != 100) {
+            endIndex = startIndex + activeAnnouncementsSearchCriteriaDTO.getPageSize();
+        }
+        if (!(startIndex > pageResult.getStream().size())) {
+            pageResult.setStream(
+                    pageResult.getStream().subList(startIndex, Math.min(endIndex, pageResult.getStream().size())));
+        } else {
+            pageResult.setStream(new ArrayList<>());
+        }
+        return pageResult;
     }
 }

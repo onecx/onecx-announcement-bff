@@ -101,27 +101,8 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
             AnnouncementPageResult announcementPageResult = response.readEntity(AnnouncementPageResult.class);
             ActiveAnnouncementsPageResultDTO announcementPageResultDTO = announcementMapper
                     .mapAnnouncementPageResultToActiveAnnouncementPageResultDTO(announcementPageResult);
-            if (searchCriteria.getWorkspaceName() == null) {
-                announcementPageResultDTO.setStream(announcementPageResultDTO.getStream().stream().filter(
-                        announcementAbstractDTO -> announcementAbstractDTO.getWorkspaceName() == null).toList());
-            }
-
-            //get global announcements
-            if (searchCriteria.getWorkspaceName() != null) {
-                searchCriteria.setWorkspaceName(null);
-                AnnouncementPageResult announcementPageResult2;
-                ActiveAnnouncementsPageResultDTO announcementPageResultDTO2;
-                try (Response response2 = client
-                        .getAnnouncements(searchCriteria)) {
-                    announcementPageResult2 = response2.readEntity(AnnouncementPageResult.class);
-                    announcementPageResultDTO2 = announcementMapper
-                            .mapAnnouncementPageResultToActiveAnnouncementPageResultDTO(announcementPageResult2);
-                    announcementPageResultDTO2.setStream(announcementPageResultDTO2.getStream().stream()
-                            .filter(announcementAbstractDTO -> announcementAbstractDTO.getWorkspaceName() == null).toList());
-                }
-                announcementPageResultDTO = announcementMapper.merge(announcementPageResultDTO, announcementPageResultDTO2,
-                        activeAnnouncementsSearchCriteriaDTO);
-            }
+            announcementPageResultDTO = announcementMapper.filterAndSort(announcementPageResultDTO,
+                    activeAnnouncementsSearchCriteriaDTO);
 
             return Response.status(response.getStatus()).entity(announcementPageResultDTO).build();
         }
