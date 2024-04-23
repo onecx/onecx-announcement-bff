@@ -500,11 +500,11 @@ class AnnouncementRestControllerTest extends AbstractTest {
 
         // Assertions
         Assertions.assertNotNull(response);
-        Assertions.assertEquals(response.getStream().size(), 3);
-        Assertions.assertEquals(response.getStream().get(0).getPriority(), AnnouncementPriorityType.IMPORTANT);
+        Assertions.assertEquals(3,response.getStream().size());
+        Assertions.assertEquals( AnnouncementPriorityType.IMPORTANT, response.getStream().get(0).getPriority());
         Assertions.assertNull(response.getStream().get(0).getWorkspaceName());
-        Assertions.assertEquals(response.getStream().get(1).getPriority(), AnnouncementPriorityType.IMPORTANT);
-        Assertions.assertEquals(response.getStream().get(1).getWorkspaceName(), "w1");
+        Assertions.assertEquals(AnnouncementPriorityType.IMPORTANT, response.getStream().get(1).getPriority());
+        Assertions.assertEquals("w1", response.getStream().get(1).getWorkspaceName());
 
     }
 }

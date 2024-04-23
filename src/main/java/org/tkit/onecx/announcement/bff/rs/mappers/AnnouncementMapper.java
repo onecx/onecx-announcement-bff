@@ -95,7 +95,7 @@ public interface AnnouncementMapper {
         if (activeAnnouncementsSearchCriteriaDTO.getPageSize() != 100) {
             endIndex = startIndex + activeAnnouncementsSearchCriteriaDTO.getPageSize();
         }
-        if (!(startIndex > pageResult.getStream().size())) {
+        if (!(startIndex <= pageResult.getStream().size())) {
             pageResult.setStream(
                     pageResult.getStream().subList(startIndex, Math.min(endIndex, pageResult.getStream().size())));
         } else {
