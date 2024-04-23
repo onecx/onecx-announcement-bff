@@ -419,4 +419,92 @@ class AnnouncementRestControllerTest extends AbstractTest {
         Assertions.assertNotNull(response);
         Assertions.assertTrue(response.contains("testWorkspace"));
     }
+
+    @Test
+    void searchActiveAnnouncements_shouldReturnAnnouncementPageResults() {
+
+        Announcement a1 = new Announcement();
+        a1.setAppId("appId");
+        a1.setContent("AnnouncmentContent");
+        a1.setPriority(AnnouncementPriorityType.IMPORTANT);
+        a1.setTitle("A1");
+        a1.setWorkspaceName("w1");
+        a1.setStartDate(OffsetDateTime.parse("2024-04-11T10:09:24-04:00"));
+        a1.setEndDate(OffsetDateTime.parse("2024-04-25T10:09:24-04:00"));
+        Announcement a2 = new Announcement();
+        a2.setAppId("appId");
+        a2.setContent("AnnouncmentContent");
+        a2.setPriority(AnnouncementPriorityType.NORMAL);
+        a2.setTitle("A2");
+        a2.setWorkspaceName("w1");
+        a2.setStartDate(OffsetDateTime.parse("2024-04-11T10:09:24-04:00"));
+        a2.setEndDate(OffsetDateTime.parse("2024-04-25T10:09:24-04:00"));
+        Announcement a3 = new Announcement();
+        a3.setAppId("appId");
+        a3.setContent("AnnouncmentContent");
+        a3.setPriority(AnnouncementPriorityType.IMPORTANT);
+        a3.setTitle("A3");
+        a3.setWorkspaceName(null);
+        a3.setStartDate(OffsetDateTime.parse("2024-04-11T10:09:24-04:00"));
+        a3.setEndDate(OffsetDateTime.parse("2024-04-25T10:09:24-04:00"));
+        Announcement a4 = new Announcement();
+        a4.setAppId("appId");
+        a4.setContent("Shouldn't be returned");
+        a4.setPriority(AnnouncementPriorityType.IMPORTANT);
+        a4.setTitle("A4");
+        a4.setWorkspaceName("w2");
+        a4.setStartDate(OffsetDateTime.parse("2024-04-11T10:09:24-04:00"));
+        a4.setEndDate(OffsetDateTime.parse("2024-04-25T10:09:24-04:00"));
+        List<Announcement> announcements = new ArrayList<>();
+        announcements.add(a1);
+        announcements.add(a2);
+        announcements.add(a3);
+        announcements.add(a4);
+
+        // Request data to svc
+        AnnouncementPageResult data = new AnnouncementPageResult();
+        data.setSize(2);
+        data.setTotalPages(1L);
+        data.setNumber(0);
+        data.setStream(announcements);
+
+        AnnouncementSearchCriteria criteria1 = new AnnouncementSearchCriteria();
+
+        // svc call prepare mock endpoint
+        mockServerClient
+                .when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/search")
+                        .withBody(JsonBody.json(criteria1))
+                        .withMethod(HttpMethod.POST))
+                .withId(mockId)
+                .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withBody(JsonBody.json(data)));
+
+        // bff call input
+        ActiveAnnouncementsSearchCriteriaDTO input = new ActiveAnnouncementsSearchCriteriaDTO();
+        input.setWorkspaceName("w1");
+        input.setCurrentDate(OffsetDateTime.parse("2024-04-24T12:15:50-04:00"));
+
+        // bff call
+        var response = given()
+                .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
+                .contentType(APPLICATION_JSON)
+                .body(input)
+                .post("/active/search")
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .contentType(APPLICATION_JSON)
+                .extract().as(AnnouncementPageResult.class);
+
+        // Assertions
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(3, response.getStream().size());
+        Assertions.assertEquals(AnnouncementPriorityType.IMPORTANT, response.getStream().get(0).getPriority());
+        Assertions.assertNull(response.getStream().get(0).getWorkspaceName());
+        Assertions.assertEquals(AnnouncementPriorityType.IMPORTANT, response.getStream().get(1).getPriority());
+        Assertions.assertEquals("w1", response.getStream().get(1).getWorkspaceName());
+
+    }
 }

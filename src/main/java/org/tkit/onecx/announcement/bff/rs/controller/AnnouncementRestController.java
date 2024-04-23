@@ -6,10 +6,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.reactive.ClientWebApplicationException;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 import org.tkit.onecx.announcement.bff.rs.mappers.AnnouncementMapper;
@@ -92,6 +92,23 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     }
 
     @Override
+    public Response searchActiveAnnouncements(ActiveAnnouncementsSearchCriteriaDTO activeAnnouncementsSearchCriteriaDTO) {
+        var searchCriteria = announcementMapper.mapActiveAnnouncementSearchCriteria(activeAnnouncementsSearchCriteriaDTO);
+        searchCriteria.setPageSize(100);
+        searchCriteria.setPageNumber(0);
+        try (Response response = client
+                .getAnnouncements(searchCriteria)) {
+            AnnouncementPageResult announcementPageResult = response.readEntity(AnnouncementPageResult.class);
+            ActiveAnnouncementsPageResultDTO announcementPageResultDTO = announcementMapper
+                    .mapAnnouncementPageResultToActiveAnnouncementPageResultDTO(announcementPageResult);
+            announcementPageResultDTO = announcementMapper.filterAndSort(announcementPageResultDTO,
+                    activeAnnouncementsSearchCriteriaDTO);
+
+            return Response.status(response.getStatus()).entity(announcementPageResultDTO).build();
+        }
+    }
+
+    @Override
     public Response searchAnnouncements(AnnouncementSearchCriteriaDTO announcementSearchCriteriaDTO) {
 
         try (Response response = client
@@ -116,13 +133,11 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
 
     @ServerExceptionMapper
     public RestResponse<ProblemDetailResponseDTO> constraint(ConstraintViolationException ex) {
-
         return exceptionMapper.constraint(ex);
     }
 
     @ServerExceptionMapper
-    public Response restException(WebApplicationException ex) {
-
-        return Response.status(ex.getResponse().getStatus()).build();
+    public Response restException(ClientWebApplicationException ex) {
+        return exceptionMapper.clientException(ex);
     }
 }
