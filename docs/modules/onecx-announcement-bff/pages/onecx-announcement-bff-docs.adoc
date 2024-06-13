@@ -28,7 +28,6 @@ quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.base-package=
 quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.return-response=true
 quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.additional-api-type-annotations=@org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.additional-model-type-annotations=@io.quarkus.runtime.annotations.RegisterForReflection;
-onecx.permissions.product-name=application
 ----
 ====
 
@@ -64,5 +63,8 @@ app:
             read: permission on all GET requests and POST search
             write: permission on PUT, POST, PATCH requests, where objects are saved or updated
             delete: permission on all DELETE requests
+----
+
+e: permission on all DELETE requests
 ----
 
