@@ -20,6 +20,8 @@ import gen.org.tkit.onecx.announcement.bff.rs.internal.AnnouncementInternalApiSe
 import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
 import gen.org.tkit.onecx.announcement.client.api.AnnouncementInternalApi;
 import gen.org.tkit.onecx.announcement.client.model.*;
+import gen.org.tkit.onecx.product.store.api.ProductsApi;
+import gen.org.tkit.onecx.product.store.model.ProductItemPageResult;
 import gen.org.tkit.onecx.workspace.client.api.WorkspaceExternalApi;
 import gen.org.tkit.onecx.workspace.client.model.WorkspacePageResult;
 import gen.org.tkit.onecx.workspace.client.model.WorkspaceSearchCriteria;
@@ -36,6 +38,10 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     @Inject
     @RestClient
     WorkspaceExternalApi workspaceClient;
+
+    @Inject
+    @RestClient
+    ProductsApi productStoreClient;
 
     @Inject
     AnnouncementMapper announcementMapper;
@@ -63,11 +69,11 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     }
 
     @Override
-    public Response getAllAppsWithAnnouncements() {
+    public Response getAllProductsWithAnnouncements() {
 
-        try (Response response = client.getAllAppsWithAnnouncements()) {
-            AnnouncementApps announcementApps = response.readEntity(AnnouncementApps.class);
-            return Response.status(response.getStatus()).entity(announcementApps).build();
+        try (Response response = client.getAllProductsWithAnnouncements()) {
+            AnnouncementProducts announcementProducts = response.readEntity(AnnouncementProducts.class);
+            return Response.status(response.getStatus()).entity(announcementProducts).build();
         }
     }
 
@@ -128,6 +134,15 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
             Announcement announcement = response.readEntity(Announcement.class);
             AnnouncementDTO announcementDTO = announcementMapper.mapAnnouncementToAnnouncementDTO(announcement);
             return Response.status(response.getStatus()).entity(announcementDTO).build();
+        }
+    }
+
+    @Override
+    public Response searchProductsByCriteria(ProductsSearchCriteriaDTO productsSearchCriteriaDTO) {
+        try (Response response = productStoreClient
+                .searchProductsByCriteria(announcementMapper.map(productsSearchCriteriaDTO))) {
+            ProductsPageResultDTO products = announcementMapper.map(response.readEntity(ProductItemPageResult.class));
+            return Response.status(response.getStatus()).entity(products).build();
         }
     }
 

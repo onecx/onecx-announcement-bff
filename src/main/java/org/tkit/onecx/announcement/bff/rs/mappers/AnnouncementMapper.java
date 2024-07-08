@@ -9,6 +9,8 @@ import org.tkit.quarkus.rs.mappers.OffsetDateTimeMapper;
 
 import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
 import gen.org.tkit.onecx.announcement.client.model.*;
+import gen.org.tkit.onecx.product.store.model.ProductItemPageResult;
+import gen.org.tkit.onecx.product.store.model.ProductItemSearchCriteria;
 import gen.org.tkit.onecx.workspace.client.model.WorkspaceAbstract;
 import gen.org.tkit.onecx.workspace.client.model.WorkspacePageResult;
 
@@ -43,7 +45,7 @@ public interface AnnouncementMapper {
     @Mapping(target = "endDateTo", ignore = true)
     @Mapping(target = "endDateFrom", source = "currentDate")
     @Mapping(target = "content", ignore = true)
-    @Mapping(target = "appId", ignore = true)
+    @Mapping(target = "productName", ignore = true)
     @Mapping(target = "workspaceName", ignore = true)
     AnnouncementSearchCriteria mapActiveAnnouncementSearchCriteria(
             ActiveAnnouncementsSearchCriteriaDTO activeAnnouncementsSearchCriteriaDTO);
@@ -103,4 +105,10 @@ public interface AnnouncementMapper {
         }
         return pageResult;
     }
+
+    @Mapping(target = "productNames", ignore = true)
+    ProductItemSearchCriteria map(ProductsSearchCriteriaDTO productsSearchCriteriaDTO);
+
+    @Mapping(target = "removeStreamItem", ignore = true)
+    ProductsPageResultDTO map(ProductItemPageResult productItemPageResult);
 }
