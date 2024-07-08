@@ -22,13 +22,22 @@ quarkus.openapi-generator.codegen.spec.onecx_announcement_svc_yaml.base-package=
 quarkus.openapi-generator.codegen.spec.onecx_announcement_svc_yaml.return-response=true
 quarkus.openapi-generator.codegen.spec.onecx_announcement_svc.additional-api-type-annotations=@org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 quarkus.openapi-generator.codegen.spec.onecx_announcement_svc.additional-model-type-annotations=@io.quarkus.runtime.annotations.RegisterForReflection;
+quarkus.openapi-generator.codegen.spec.onecx_announcement_svc_yaml.enable-security-generation=false
 quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.config-key=onecx_workspace_svc_v1
 quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.base-package=gen.org.tkit.onecx.workspace.client
 quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.return-response=true
 quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.additional-api-type-annotations=@org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.additional-model-type-annotations=@io.quarkus.runtime.annotations.RegisterForReflection;
-%prod.quarkus.rest-client.onecx_announcement_svc_yaml.providers=io.quarkus.oidc.client.reactive.filter.OidcClientRequestReactiveFilter
-%prod.quarkus.rest-client.onecx_workspace_svc_v1_yaml.providers=io.quarkus.oidc.client.reactive.filter.OidcClientRequestReactiveFilter
+quarkus.openapi-generator.codegen.spec.onecx_workspace_svc_v1_yaml.enable-security-generation=false
+quarkus.openapi-generator.codegen.spec.onecx_product_store_v1_yaml.config-key=onecx_product_store
+quarkus.openapi-generator.codegen.spec.onecx_product_store_v1_yaml.base-package=gen.org.tkit.onecx.product.store
+quarkus.openapi-generator.codegen.spec.onecx_product_store_v1_yaml.return-response=true
+quarkus.openapi-generator.codegen.spec.onecx_product_store_v1_yaml.additional-api-type-annotations=@org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
+quarkus.openapi-generator.codegen.spec.onecx_product_store_v1_yaml.additional-model-type-annotations=@io.quarkus.runtime.annotations.RegisterForReflection;
+quarkus.openapi-generator.codegen.spec.onecx_product_store_v1_yaml.enable-security-generation=false
+%prod.quarkus.rest-client.onecx_announcement_svc.providers=io.quarkus.oidc.client.reactive.filter.OidcClientRequestReactiveFilter
+%prod.quarkus.rest-client.onecx_workspace_svc_v1.providers=io.quarkus.oidc.client.reactive.filter.OidcClientRequestReactiveFilter
+%prod.quarkus.rest-client.onecx_product_store.providers=io.quarkus.oidc.client.reactive.filter.OidcClientRequestReactiveFilter
 %prod.quarkus.oidc-client.client-id=${quarkus.application.name}
 ----
 ====
@@ -65,8 +74,13 @@ app:
             read: permission on all GET requests and POST search
             write: permission on PUT, POST, PATCH requests, where objects are saved or updated
             delete: permission on all DELETE requests
+          product:
+            read: permission on all GET requests and POST search
     keycloak:
       client:
         enabled: true
+        spec:
+          kcConfig:
+            defaultClientScopes: [ ocx-an:all, ocx-ws:read, ocx-pm:read, ocx-ps:read ]
 ----
 

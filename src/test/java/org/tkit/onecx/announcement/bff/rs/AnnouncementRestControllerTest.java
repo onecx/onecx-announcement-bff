@@ -23,6 +23,9 @@ import org.tkit.onecx.announcement.bff.rs.controller.AnnouncementRestController;
 
 import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
 import gen.org.tkit.onecx.announcement.client.model.*;
+import gen.org.tkit.onecx.product.store.model.ProductItem;
+import gen.org.tkit.onecx.product.store.model.ProductItemPageResult;
+import gen.org.tkit.onecx.product.store.model.ProductItemSearchCriteria;
 import gen.org.tkit.onecx.workspace.client.model.WorkspaceAbstract;
 import gen.org.tkit.onecx.workspace.client.model.WorkspacePageResult;
 import io.quarkiverse.mockserver.test.InjectMockServerClient;
@@ -55,7 +58,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
 
         // Request data to svc
         Announcement data = new Announcement();
-        data.setAppId("appId");
+        data.setProductName("productName");
         data.setContent("AnnouncmentContent");
         data.setTitle("announcementTitle");
         data.startDate(offsetDateTime);
@@ -71,7 +74,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
 
         // bff call input
         CreateAnnouncementRequestDTO input = new CreateAnnouncementRequestDTO();
-        input.setAppId("appId1");
+        input.setProductName("productName1");
         input.setTitle("announcementTitle");
         input.startDate(offsetDateTime);
 
@@ -101,7 +104,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
 
         // Assertions
         Assertions.assertNotNull(response);
-        Assertions.assertEquals(data.getAppId(), response.getAppId());
+        Assertions.assertEquals(data.getProductName(), response.getProductName());
         Assertions.assertEquals(data.getContent(), response.getContent());
     }
 
@@ -109,7 +112,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
     void getAnnouncements_shouldReturnAnnouncementPageResults() {
 
         Announcement announcement = new Announcement();
-        announcement.setAppId("appId");
+        announcement.setProductName("productName");
         announcement.setContent("AnnouncmentContent");
         List<Announcement> announcements = new ArrayList<>();
         announcements.add(announcement);
@@ -158,7 +161,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
     void getAnnouncementById_shouldReturnAnnouncement() {
         // Request data to svc
         Announcement data = new Announcement();
-        data.setAppId("appIdTest1");
+        data.setProductName("productNameTest1");
 
         // svc call prepare mock endpoint
         mockServerClient
@@ -186,22 +189,22 @@ class AnnouncementRestControllerTest extends AbstractTest {
 
         // Assertions
         Assertions.assertNotNull(response);
-        Assertions.assertEquals("appIdTest1", response.getAppId());
+        Assertions.assertEquals("productNameTest1", response.getProductName());
     }
 
     @Test
     void getAllAppsWithAnnouncements_shouldReturnAnnouncementApps() {
         // Request data to svc
-        AnnouncementApps data = new AnnouncementApps();
-        List<String> appIds = new ArrayList<>();
-        appIds.add("1");
-        appIds.add("2");
-        data.setAppIds(appIds);
+        AnnouncementProducts data = new AnnouncementProducts();
+        List<String> productNames = new ArrayList<>();
+        productNames.add("1");
+        productNames.add("2");
+        data.setProductNames(productNames);
 
         // svc call prepare mock endpoint
         mockServerClient
                 .when(request()
-                        .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/appIds")
+                        .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/products")
                         .withMethod(HttpMethod.GET))
                 .withId(mockId)
                 .respond(
@@ -218,16 +221,16 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
                 .header(APM_HEADER_PARAM, ADMIN)
                 .contentType(APPLICATION_JSON)
-                .get("/appIds")
+                .get("/products")
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .contentType(APPLICATION_JSON)
-                .extract().as(AnnouncementApps.class);
+                .extract().as(AnnouncementProducts.class);
 
         // Assertions
         Assertions.assertNotNull(response);
-        Assertions.assertEquals(2, response.getAppIds().size());
-        Assertions.assertEquals(response.getAppIds(), data.getAppIds());
+        Assertions.assertEquals(2, response.getProductNames().size());
+        Assertions.assertEquals(response.getProductNames(), data.getProductNames());
 
     }
 
@@ -295,7 +298,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
 
         String updateId = "updateId_NO_CONTENT";
         Announcement data = new Announcement();
-        data.setAppId("appIdTest1");
+        data.setProductName("productNameTest1");
 
         mockServerClient
                 .when(request()
@@ -424,7 +427,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
     void searchActiveAnnouncements_shouldReturnAnnouncementPageResults() {
 
         Announcement a1 = new Announcement();
-        a1.setAppId("appId");
+        a1.setProductName("productName");
         a1.setContent("AnnouncmentContent");
         a1.setPriority(AnnouncementPriorityType.IMPORTANT);
         a1.setTitle("A1");
@@ -432,7 +435,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
         a1.setStartDate(OffsetDateTime.parse("2024-04-11T10:09:24-04:00"));
         a1.setEndDate(OffsetDateTime.parse("2024-04-25T10:09:24-04:00"));
         Announcement a2 = new Announcement();
-        a2.setAppId("appId");
+        a2.setProductName("productName");
         a2.setContent("AnnouncmentContent");
         a2.setPriority(AnnouncementPriorityType.NORMAL);
         a2.setTitle("A2");
@@ -440,7 +443,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
         a2.setStartDate(OffsetDateTime.parse("2024-04-11T10:09:24-04:00"));
         a2.setEndDate(OffsetDateTime.parse("2024-04-25T10:09:24-04:00"));
         Announcement a3 = new Announcement();
-        a3.setAppId("appId");
+        a3.setProductName("productName");
         a3.setContent("AnnouncmentContent");
         a3.setPriority(AnnouncementPriorityType.IMPORTANT);
         a3.setTitle("A3");
@@ -448,7 +451,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
         a3.setStartDate(OffsetDateTime.parse("2024-04-11T10:09:24-04:00"));
         a3.setEndDate(OffsetDateTime.parse("2024-04-25T10:09:24-04:00"));
         Announcement a4 = new Announcement();
-        a4.setAppId("appId");
+        a4.setProductName("productName");
         a4.setContent("Shouldn't be returned");
         a4.setPriority(AnnouncementPriorityType.IMPORTANT);
         a4.setTitle("A4");
@@ -506,5 +509,47 @@ class AnnouncementRestControllerTest extends AbstractTest {
         Assertions.assertEquals(AnnouncementPriorityType.IMPORTANT, response.getStream().get(1).getPriority());
         Assertions.assertEquals("w1", response.getStream().get(1).getWorkspaceName());
 
+    }
+
+    @Test
+    void getAllProductsTest() {
+
+        ProductItemSearchCriteria criteria = new ProductItemSearchCriteria();
+        criteria.pageNumber(0).pageSize(1);
+        ProductItemPageResult result = new ProductItemPageResult();
+        result.totalElements(2L).stream(List.of(new ProductItem().name("P1").displayName("Product1"),
+                new ProductItem().name("P2").displayName("Product2")));
+
+        mockServerClient
+                .when(request().withPath("/v1/products/search")
+                        .withMethod(HttpMethod.POST)
+                        .withBody(JsonBody.json(criteria)))
+                .withPriority(100)
+                .withId(mockId)
+                .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withBody(JsonBody.json(result)));
+
+        ProductsSearchCriteriaDTO criteriaDTO = new ProductsSearchCriteriaDTO();
+        criteriaDTO.pageNumber(0).pageSize(1);
+        // bff call
+        var response = given()
+                .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
+                .contentType(APPLICATION_JSON)
+                .body(criteriaDTO)
+                .post("/products/available")
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .contentType(APPLICATION_JSON)
+                .extract().as(ProductsPageResultDTO.class);
+
+        Assertions.assertEquals(2, response.getStream().size());
+        Assertions.assertEquals("P1", response.getStream().get(0).getName());
+        Assertions.assertEquals("Product1", response.getStream().get(0).getDisplayName());
+        Assertions.assertEquals("P2", response.getStream().get(1).getName());
+        Assertions.assertEquals("Product2", response.getStream().get(1).getDisplayName());
+        mockServerClient.clear(mockId);
     }
 }
