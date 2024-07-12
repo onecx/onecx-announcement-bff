@@ -1,7 +1,6 @@
 package org.tkit.onecx.announcement.bff.rs.mappers;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,17 +10,23 @@ import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
 import gen.org.tkit.onecx.announcement.client.model.*;
 import gen.org.tkit.onecx.product.store.model.ProductItemPageResult;
 import gen.org.tkit.onecx.product.store.model.ProductItemSearchCriteria;
-import gen.org.tkit.onecx.workspace.client.model.WorkspaceAbstract;
 import gen.org.tkit.onecx.workspace.client.model.WorkspacePageResult;
 
 @Mapper(uses = { OffsetDateTimeMapper.class })
 public interface AnnouncementMapper {
 
-    default Set<String> workspaceNames(WorkspacePageResult result) {
+    default List<WorkspaceAbstractDTO> workspaceNames(WorkspacePageResult result) {
         if (result == null || result.getStream() == null) {
-            return Set.of();
+            return List.of();
         }
-        return result.getStream().stream().map(WorkspaceAbstract::getName).collect(Collectors.toSet());
+        List<WorkspaceAbstractDTO> abstracts = new ArrayList<>();
+        result.getStream().forEach(workspaceAbstract -> {
+            WorkspaceAbstractDTO abstractDTO = new WorkspaceAbstractDTO();
+            abstractDTO.setName(workspaceAbstract.getName());
+            abstractDTO.setDisplayName(workspaceAbstract.getDisplayName());
+            abstracts.add(abstractDTO);
+        });
+        return abstracts;
     }
 
     CreateAnnouncementRequest mapCreateAnnouncement(CreateAnnouncementRequestDTO createAnnouncementRequestDTO);
@@ -111,4 +116,8 @@ public interface AnnouncementMapper {
 
     @Mapping(target = "removeStreamItem", ignore = true)
     ProductsPageResultDTO map(ProductItemPageResult productItemPageResult);
+
+    @Mapping(target = "removeWorkspaceNamesItem", ignore = true)
+    @Mapping(target = "removeProductNamesItem", ignore = true)
+    AnnouncementProductsDTO map(AnnouncementProducts announcementProducts);
 }

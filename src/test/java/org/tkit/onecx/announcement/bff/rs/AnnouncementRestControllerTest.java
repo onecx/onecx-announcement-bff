@@ -7,7 +7,6 @@ import static org.mockserver.model.HttpResponse.response;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import jakarta.ws.rs.HttpMethod;
@@ -417,10 +416,10 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .contentType(APPLICATION_JSON)
-                .extract().as(HashSet.class);
+                .extract().as(WorkspaceAbstractDTO[].class);
 
         Assertions.assertNotNull(response);
-        Assertions.assertTrue(response.contains("testWorkspace"));
+        Assertions.assertEquals("testWorkspace", response[0].getName());
     }
 
     @Test

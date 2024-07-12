@@ -1,6 +1,6 @@
 package org.tkit.onecx.announcement.bff.rs.controller;
 
-import java.util.Set;
+import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -72,14 +72,15 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     public Response getAllProductsWithAnnouncements() {
 
         try (Response response = client.getAllProductsWithAnnouncements()) {
-            AnnouncementProducts announcementProducts = response.readEntity(AnnouncementProducts.class);
-            return Response.status(response.getStatus()).entity(announcementProducts).build();
+            AnnouncementProductsDTO announcementProductsDTO = announcementMapper
+                    .map(response.readEntity(AnnouncementProducts.class));
+            return Response.status(response.getStatus()).entity(announcementProductsDTO).build();
         }
     }
 
     @Override
     public Response getAllWorkspaceNames() {
-        Set<String> workspaceNames;
+        List<WorkspaceAbstractDTO> workspaceNames;
         try (Response response = workspaceClient.searchWorkspaces(new WorkspaceSearchCriteria())) {
             var result = response.readEntity(WorkspacePageResult.class);
             workspaceNames = announcementMapper.workspaceNames(result);
