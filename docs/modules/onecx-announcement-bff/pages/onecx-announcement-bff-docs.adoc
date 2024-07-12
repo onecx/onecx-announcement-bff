@@ -16,6 +16,7 @@ onecx.permissions.application-id=${quarkus.application.name}
 org.eclipse.microprofile.rest.client.propagateHeaders=apm-principal-token
 %prod.quarkus.rest-client.onecx_announcement_svc.url=http://onecx-announcement-svc:8080
 %prod.quarkus.rest-client.onecx_workspace_svc_v1.url=http://onecx-workspace-svc:8080
+%prod.quarkus.rest-client.onecx_product_store.url=http://onecx-product-store-svc:8080
 quarkus.openapi-generator.codegen.input-base-dir=target/tmp/openapi
 quarkus.openapi-generator.codegen.spec.onecx_announcement_svc_yaml.config-key=onecx_announcement_svc
 quarkus.openapi-generator.codegen.spec.onecx_announcement_svc_yaml.base-package=gen.org.tkit.onecx.announcement.client
