@@ -197,7 +197,7 @@ paths:
     get:
       x-onecx:
         permissions:
-          announcement:
+          workspace:
             - read
       tags:
         - AnnouncementInternal
