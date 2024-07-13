@@ -21,6 +21,7 @@
               "delete"
             ],
             "product": ["read"],
+            "workspace": ["read"],
             "permissions": [
               "admin-write",
               "admin-read"
@@ -51,6 +52,7 @@
               "read"
             ],
             "product": ["read"],
+            "workspace": ["read"],
             "permissions": [
               "admin-write",
               "admin-read"
