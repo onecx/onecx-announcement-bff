@@ -119,5 +119,5 @@ public interface AnnouncementMapper {
 
     @Mapping(target = "removeWorkspaceNamesItem", ignore = true)
     @Mapping(target = "removeProductNamesItem", ignore = true)
-    AnnouncementProductsDTO map(AnnouncementProducts announcementProducts);
+    AnnouncementAssignmentsDTO map(AnnouncementProducts announcementProducts);
 }

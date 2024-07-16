@@ -6,6 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -69,12 +70,12 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     }
 
     @Override
-    public Response getAllProductsWithAnnouncements() {
+    public Response getAllAnnouncementAssignments() {
 
         try (Response response = client.getAllProductsWithAnnouncements()) {
-            AnnouncementProductsDTO announcementProductsDTO = announcementMapper
+            AnnouncementAssignmentsDTO announcementAssignmentsDTO = announcementMapper
                     .map(response.readEntity(AnnouncementProducts.class));
-            return Response.status(response.getStatus()).entity(announcementProductsDTO).build();
+            return Response.status(response.getStatus()).entity(announcementAssignmentsDTO).build();
         }
     }
 
@@ -138,15 +139,6 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
         }
     }
 
-    @Override
-    public Response searchProductsByCriteria(ProductsSearchCriteriaDTO productsSearchCriteriaDTO) {
-        try (Response response = productStoreClient
-                .searchProductsByCriteria(announcementMapper.map(productsSearchCriteriaDTO))) {
-            ProductsPageResultDTO products = announcementMapper.map(response.readEntity(ProductItemPageResult.class));
-            return Response.status(response.getStatus()).entity(products).build();
-        }
-    }
-
     @ServerExceptionMapper
     public RestResponse<ProblemDetailResponseDTO> constraint(ConstraintViolationException ex) {
         return exceptionMapper.constraint(ex);
@@ -155,5 +147,14 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     @ServerExceptionMapper
     public Response restException(ClientWebApplicationException ex) {
         return exceptionMapper.clientException(ex);
+    }
+
+    @Override
+    public Response getAllProductNames(@Valid ProductsSearchCriteriaDTO productsSearchCriteriaDTO) {
+        try (Response response = productStoreClient
+                .searchProductsByCriteria(announcementMapper.map(productsSearchCriteriaDTO))) {
+            ProductsPageResultDTO products = announcementMapper.map(response.readEntity(ProductItemPageResult.class));
+            return Response.status(response.getStatus()).entity(products).build();
+        }
     }
 }
