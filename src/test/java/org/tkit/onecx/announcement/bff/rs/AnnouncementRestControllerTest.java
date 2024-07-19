@@ -40,14 +40,14 @@ class AnnouncementRestControllerTest extends AbstractTest {
     @InjectMockServerClient
     MockServerClient mockServerClient;
 
-    static final String mockId = "MOCK";
+    static final String MOCK_ID = "MOCK";
 
     @BeforeEach
     void resetExpectation() {
         try {
-            mockServerClient.clear(mockId);
+            mockServerClient.clear(MOCK_ID);
         } catch (Exception ex) {
-            //  mockId not existing
+            //  MOCK_ID not existing
         }
     }
 
@@ -66,7 +66,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
         mockServerClient
                 .when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH)
                         .withMethod(HttpMethod.POST))
-                .withId(mockId)
+                .withId(MOCK_ID)
                 .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withBody(JsonBody.json(data)));
@@ -127,7 +127,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
         mockServerClient
                 .when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/search")
                         .withMethod(HttpMethod.POST))
-                .withId(mockId)
+                .withId(MOCK_ID)
                 .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withBody(JsonBody.json(data)));
@@ -167,7 +167,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request()
                         .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/1")
                         .withMethod(HttpMethod.GET))
-                .withId(mockId)
+                .withId(MOCK_ID)
                 .respond(
                         httpRequest -> response()
                                 .withStatusCode(Response.Status.OK.getStatusCode())
@@ -205,7 +205,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request()
                         .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/products")
                         .withMethod(HttpMethod.GET))
-                .withId(mockId)
+                .withId(MOCK_ID)
                 .respond(
                         httpRequest -> response()
                                 .withStatusCode(Response.Status.OK.getStatusCode())
@@ -245,7 +245,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request()
                         .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/" + idNotFound)
                         .withMethod(HttpMethod.GET))
-                .withId(mockId)
+                .withId(MOCK_ID)
                 .respond(
                         httpRequest -> response()
                                 .withStatusCode(Response.Status.NOT_FOUND.getStatusCode())
@@ -272,7 +272,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request()
                         .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/" + deleteId)
                         .withMethod(HttpMethod.DELETE))
-                .withId(mockId)
+                .withId(MOCK_ID)
                 .respond(
                         httpRequest -> response()
                                 .withStatusCode(Response.Status.NO_CONTENT.getStatusCode()));
@@ -303,7 +303,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request()
                         .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/" + updateId)
                         .withMethod(HttpMethod.PUT))
-                .withId(mockId)
+                .withId(MOCK_ID)
                 .respond(
                         httpRequest -> response()
                                 .withStatusCode(Response.Status.OK.getStatusCode())
@@ -336,12 +336,11 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request()
                         .withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/" + updateId)
                         .withMethod(HttpMethod.PUT))
-                .withId(mockId)
+                .withId(MOCK_ID)
                 .respond(
                         httpRequest -> response()
                                 .withStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                                 .withBody(JsonBody.json(problemDetailResponse)));
-        ;
 
         UpdateAnnouncementRequestDTO input = new UpdateAnnouncementRequestDTO();
         // bff call
@@ -374,7 +373,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
         data.setInvalidParams(list);
 
         mockServerClient.when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH).withMethod(HttpMethod.POST))
-                .withId(mockId)
+                .withId(MOCK_ID)
                 .respond(httpRequest -> response().withStatusCode(Response.Status.BAD_REQUEST.getStatusCode())
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withBody(JsonBody.json(data)));
@@ -477,7 +476,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/search")
                         .withBody(JsonBody.json(criteria1))
                         .withMethod(HttpMethod.POST))
-                .withId(mockId)
+                .withId(MOCK_ID)
                 .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withBody(JsonBody.json(data)));
@@ -525,7 +524,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
                         .withMethod(HttpMethod.POST)
                         .withBody(JsonBody.json(criteria)))
                 .withPriority(100)
-                .withId(mockId)
+                .withId(MOCK_ID)
                 .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
                         .withContentType(MediaType.APPLICATION_JSON)
                         .withBody(JsonBody.json(result)));
@@ -550,6 +549,6 @@ class AnnouncementRestControllerTest extends AbstractTest {
         Assertions.assertEquals("Product1", response.getStream().get(0).getDisplayName());
         Assertions.assertEquals("P2", response.getStream().get(1).getName());
         Assertions.assertEquals("Product2", response.getStream().get(1).getDisplayName());
-        mockServerClient.clear(mockId);
+        mockServerClient.clear(MOCK_ID);
     }
 }
