@@ -484,6 +484,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
         // bff call input
         ActiveAnnouncementsSearchCriteriaDTO input = new ActiveAnnouncementsSearchCriteriaDTO();
         input.setWorkspaceName("w1");
+        input.setProductName("productName");
         input.setCurrentDate(OffsetDateTime.parse("2024-04-24T12:15:50-04:00"));
 
         // bff call

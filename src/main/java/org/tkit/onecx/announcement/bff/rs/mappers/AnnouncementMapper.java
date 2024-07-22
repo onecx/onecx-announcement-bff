@@ -81,6 +81,17 @@ public interface AnnouncementMapper {
             pageResult.setStream(announcementPageResultDTO.getStream().stream()
                     .filter(announcementAbstractDTO -> announcementAbstractDTO.getWorkspaceName() == null).toList());
         }
+
+        if (activeAnnouncementsSearchCriteriaDTO.getProductName() != null) {
+            pageResult.setStream(pageResult.getStream().stream()
+                    .filter(announcementAbstractDTO -> announcementAbstractDTO.getProductName() == null
+                            || announcementAbstractDTO.getProductName().equals(activeAnnouncementsSearchCriteriaDTO
+                                    .getProductName()))
+                    .toList());
+        } else {
+            pageResult.setStream(pageResult.getStream().stream()
+                    .filter(announcementAbstractDTO -> announcementAbstractDTO.getProductName() == null).toList());
+        }
         //remove duplicates
         HashSet<AnnouncementAbstractDTO> set = new HashSet<>(pageResult.getStream());
         pageResult.setStream(sort(set.stream().toList()));
