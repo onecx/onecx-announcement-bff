@@ -117,6 +117,18 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     }
 
     @Override
+    public Response searchAnnouncementBanners(AnnouncementBannerSearchCriteriaDTO announcementBannerSearchCriteriaDTO) {
+        try (Response response = client
+                .searchAnnouncementBanners(
+                        announcementMapper.mapAnnouncementBannerSearchCriteria(announcementBannerSearchCriteriaDTO))) {
+            AnnouncementPageResult announcementPageResult = response.readEntity(AnnouncementPageResult.class);
+            AnnouncementPageResultDTO announcementPageResultDTO = announcementMapper
+                    .mapAnnouncementPageResultToAnnouncementPageResultDTO(announcementPageResult);
+            return Response.status(response.getStatus()).entity(announcementPageResultDTO).build();
+        }
+    }
+
+    @Override
     public Response searchAnnouncements(AnnouncementSearchCriteriaDTO announcementSearchCriteriaDTO) {
 
         try (Response response = client

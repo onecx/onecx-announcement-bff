@@ -118,9 +118,6 @@ class AnnouncementRestControllerTest extends AbstractTest {
 
         // Request data to svc
         AnnouncementPageResult data = new AnnouncementPageResult();
-        data.setSize(5);
-        data.setTotalPages(1L);
-        data.setNumber(2);
         data.setStream(announcements);
 
         // svc call prepare mock endpoint
@@ -147,6 +144,57 @@ class AnnouncementRestControllerTest extends AbstractTest {
                 .statusCode(Response.Status.OK.getStatusCode())
                 .contentType(APPLICATION_JSON)
                 .extract().as(AnnouncementPageResult.class);
+
+        // Assertions
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(data.getNumber(), response.getNumber());
+        Assertions.assertEquals(data.getSize(), response.getSize());
+        Assertions.assertEquals(1, data.getStream().size());
+        Assertions.assertEquals(data.getStream().get(0), announcement);
+    }
+
+    @Test
+    void getAnnouncementBanners_shouldReturnAnnouncementPageResults() {
+
+        Announcement announcement = new Announcement();
+        announcement.setProductName("productName");
+        announcement.setContent("AnnouncementContent");
+        List<Announcement> announcements = new ArrayList<>();
+        announcements.add(announcement);
+
+        // Request data to svc
+        AnnouncementPageResult data = new AnnouncementPageResult();
+        data.setStream(announcements);
+
+        AnnouncementBannerSearchCriteria criteria = new AnnouncementBannerSearchCriteria();
+        var dateTime = OffsetDateTime.parse("2023-11-30T13:53:03.688710200+01:00");
+        criteria.setCurrentDate(dateTime);
+
+        // svc call prepare mock endpoint
+        mockServerClient
+                .when(request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/banner/search")
+                        .withMethod(HttpMethod.POST))
+                .withId(MOCK_ID)
+                .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withBody(JsonBody.json(data)));
+
+        // bff call input
+        AnnouncementBannerSearchCriteriaDTO input = new AnnouncementBannerSearchCriteriaDTO();
+        input.setCurrentDate(dateTime);
+
+        // bff call
+        var response = given()
+                .when()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
+                .contentType(APPLICATION_JSON)
+                .body(input)
+                .post("/banner/search")
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .contentType(APPLICATION_JSON)
+                .extract().as(AnnouncementPageResultDTO.class);
 
         // Assertions
         Assertions.assertNotNull(response);
