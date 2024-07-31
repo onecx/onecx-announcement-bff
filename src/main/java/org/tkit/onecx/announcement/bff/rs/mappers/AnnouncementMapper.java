@@ -131,4 +131,7 @@ public interface AnnouncementMapper {
     @Mapping(target = "removeWorkspaceNamesItem", ignore = true)
     @Mapping(target = "removeProductNamesItem", ignore = true)
     AnnouncementAssignmentsDTO map(AnnouncementProducts announcementProducts);
+
+    AnnouncementBannerSearchCriteria mapAnnouncementBannerSearchCriteria(
+            AnnouncementBannerSearchCriteriaDTO announcementBannerSearchCriteriaDTO);
 }
