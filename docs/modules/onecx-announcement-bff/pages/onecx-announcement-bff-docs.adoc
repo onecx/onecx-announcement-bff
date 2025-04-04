@@ -85,5 +85,9 @@ app:
         spec:
           kcConfig:
             defaultClientScopes: [ ocx-an:all, ocx-ws:read, ocx-pm:read, ocx-ps:read ]
+    microservice:
+      spec:
+        description: OneCX Announcement Backend For Frontend
+        name: OneCX Announcement BFF
 ----
 
