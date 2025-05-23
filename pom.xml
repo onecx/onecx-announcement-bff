@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.tkit.onecx</groupId>
         <artifactId>onecx-quarkus3-parent</artifactId>
-        <version>0.72.4</version>
+        <version>1.2.0</version>
     </parent>
 
     <artifactId>onecx-announcement-bff</artifactId>
@@ -35,7 +35,7 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-rest-client-reactive-jackson</artifactId>
+            <artifactId>quarkus-rest-client-jackson</artifactId>
         </dependency>
 
         <dependency>
@@ -85,7 +85,7 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-oidc-client-reactive-filter</artifactId>
+            <artifactId>quarkus-rest-client-oidc-filter</artifactId>
         </dependency>
         <dependency>
             <groupId>org.tkit.quarkus.lib</groupId>
