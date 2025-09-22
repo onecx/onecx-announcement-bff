@@ -22,11 +22,6 @@ import org.tkit.onecx.announcement.bff.rs.controller.AnnouncementRestController;
 
 import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
 import gen.org.tkit.onecx.announcement.client.model.*;
-import gen.org.tkit.onecx.product.store.model.ProductItem;
-import gen.org.tkit.onecx.product.store.model.ProductItemPageResult;
-import gen.org.tkit.onecx.product.store.model.ProductItemSearchCriteria;
-import gen.org.tkit.onecx.workspace.client.model.WorkspaceAbstract;
-import gen.org.tkit.onecx.workspace.client.model.WorkspacePageResult;
 import io.quarkiverse.mockserver.test.InjectMockServerClient;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
@@ -441,35 +436,6 @@ class AnnouncementRestControllerTest extends AbstractTest {
     }
 
     @Test
-    void getAllWorkspaceNames() {
-
-        var result = new WorkspacePageResult().stream(List.of(
-                new WorkspaceAbstract().name("testWorkspace").description("testWorkspace")));
-
-        // create mock rest endpoint
-        mockServerClient
-                .when(request().withPath("/v1/workspaces/search")
-                        .withMethod(HttpMethod.POST))
-                .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
-                        .withContentType(MediaType.APPLICATION_JSON)
-                        .withBody(JsonBody.json(result)));
-
-        var response = given()
-                .when()
-                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
-                .header(APM_HEADER_PARAM, ADMIN)
-                .contentType(APPLICATION_JSON)
-                .get("/workspaces/available")
-                .then()
-                .statusCode(Response.Status.OK.getStatusCode())
-                .contentType(APPLICATION_JSON)
-                .extract().as(WorkspaceAbstractDTO[].class);
-
-        Assertions.assertNotNull(response);
-        Assertions.assertEquals("testWorkspace", response[0].getName());
-    }
-
-    @Test
     void searchActiveAnnouncements_shouldReturnAnnouncementPageResults() {
 
         Announcement a1 = new Announcement();
@@ -556,47 +522,5 @@ class AnnouncementRestControllerTest extends AbstractTest {
         Assertions.assertEquals(AnnouncementPriorityType.IMPORTANT, response.getStream().get(1).getPriority());
         Assertions.assertEquals("w1", response.getStream().get(1).getWorkspaceName());
 
-    }
-
-    @Test
-    void getAllProductsTest() {
-
-        ProductItemSearchCriteria criteria = new ProductItemSearchCriteria();
-        criteria.pageNumber(0).pageSize(1);
-        ProductItemPageResult result = new ProductItemPageResult();
-        result.totalElements(2L).stream(List.of(new ProductItem().name("P1").displayName("Product1"),
-                new ProductItem().name("P2").displayName("Product2")));
-
-        mockServerClient
-                .when(request().withPath("/v1/products/search")
-                        .withMethod(HttpMethod.POST)
-                        .withBody(JsonBody.json(criteria)))
-                .withPriority(100)
-                .withId(MOCK_ID)
-                .respond(httpRequest -> response().withStatusCode(Response.Status.OK.getStatusCode())
-                        .withContentType(MediaType.APPLICATION_JSON)
-                        .withBody(JsonBody.json(result)));
-
-        ProductsSearchCriteriaDTO criteriaDTO = new ProductsSearchCriteriaDTO();
-        criteriaDTO.pageNumber(0).pageSize(1);
-        // bff call
-        var response = given()
-                .when()
-                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
-                .header(APM_HEADER_PARAM, ADMIN)
-                .contentType(APPLICATION_JSON)
-                .body(criteriaDTO)
-                .post("/products/available")
-                .then()
-                .statusCode(Response.Status.OK.getStatusCode())
-                .contentType(APPLICATION_JSON)
-                .extract().as(ProductsPageResultDTO.class);
-
-        Assertions.assertEquals(2, response.getStream().size());
-        Assertions.assertEquals("P1", response.getStream().get(0).getName());
-        Assertions.assertEquals("Product1", response.getStream().get(0).getDisplayName());
-        Assertions.assertEquals("P2", response.getStream().get(1).getName());
-        Assertions.assertEquals("Product2", response.getStream().get(1).getDisplayName());
-        mockServerClient.clear(MOCK_ID);
     }
 }
