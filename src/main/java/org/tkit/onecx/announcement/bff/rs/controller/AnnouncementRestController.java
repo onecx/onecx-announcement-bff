@@ -1,12 +1,9 @@
 package org.tkit.onecx.announcement.bff.rs.controller;
 
-import java.util.List;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -21,11 +18,6 @@ import gen.org.tkit.onecx.announcement.bff.rs.internal.AnnouncementInternalApiSe
 import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
 import gen.org.tkit.onecx.announcement.client.api.AnnouncementInternalApi;
 import gen.org.tkit.onecx.announcement.client.model.*;
-import gen.org.tkit.onecx.product.store.api.ProductsApi;
-import gen.org.tkit.onecx.product.store.model.ProductItemPageResult;
-import gen.org.tkit.onecx.workspace.client.api.WorkspaceExternalApi;
-import gen.org.tkit.onecx.workspace.client.model.WorkspacePageResult;
-import gen.org.tkit.onecx.workspace.client.model.WorkspaceSearchCriteria;
 
 @ApplicationScoped
 @Transactional(value = Transactional.TxType.NOT_SUPPORTED)
@@ -35,14 +27,6 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     @Inject
     @RestClient
     AnnouncementInternalApi client;
-
-    @Inject
-    @RestClient
-    WorkspaceExternalApi workspaceClient;
-
-    @Inject
-    @RestClient
-    ProductsApi productStoreClient;
 
     @Inject
     AnnouncementMapper announcementMapper;
@@ -77,16 +61,6 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
                     .map(response.readEntity(AnnouncementProducts.class));
             return Response.status(response.getStatus()).entity(announcementAssignmentsDTO).build();
         }
-    }
-
-    @Override
-    public Response getAllWorkspaceNames() {
-        List<WorkspaceAbstractDTO> workspaceNames;
-        try (Response response = workspaceClient.searchWorkspaces(new WorkspaceSearchCriteria())) {
-            var result = response.readEntity(WorkspacePageResult.class);
-            workspaceNames = announcementMapper.workspaceNames(result);
-        }
-        return Response.status(Response.Status.OK).entity(workspaceNames).build();
     }
 
     @Override
@@ -159,14 +133,5 @@ public class AnnouncementRestController implements AnnouncementInternalApiServic
     @ServerExceptionMapper
     public Response restException(ClientWebApplicationException ex) {
         return exceptionMapper.clientException(ex);
-    }
-
-    @Override
-    public Response getAllProductNames(@Valid ProductsSearchCriteriaDTO productsSearchCriteriaDTO) {
-        try (Response response = productStoreClient
-                .searchProductsByCriteria(announcementMapper.map(productsSearchCriteriaDTO))) {
-            ProductsPageResultDTO products = announcementMapper.map(response.readEntity(ProductItemPageResult.class));
-            return Response.status(response.getStatus()).entity(products).build();
-        }
     }
 }
