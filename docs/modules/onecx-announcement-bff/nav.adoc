@@ -1,1 +1,0 @@
-* xref:onecx-announcement-bff:index.adoc[Announcement Bff]
