@@ -2,7 +2,6 @@ include::onecx-announcement-bff-attributes.adoc[opts=optional]
 
 == onecx-announcement-bff
 
-include::docs.adoc[opts=optional]
-
+// include::docs.adoc[opts=optional]
 
 include::onecx-announcement-bff-docs.adoc[opts=optional]
