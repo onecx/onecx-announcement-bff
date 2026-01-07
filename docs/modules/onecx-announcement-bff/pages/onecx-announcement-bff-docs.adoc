@@ -91,7 +91,3 @@ app:
         name: OneCX Announcement BFF
 ----
 
-cription: OneCX Announcement Backend For Frontend
-        name: OneCX Announcement BFF
-----
-
