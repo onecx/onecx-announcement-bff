@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>onecx-announcement-bff</artifactId>
+    <name>OneCX Announcement Backend For Frontend</name>
     <version>999-SNAPSHOT</version>
     <dependencies>
         <dependency>
