@@ -1,2 +1,2 @@
 # onecx-announcement-bff
-OneCX Announcement BFF
+OneCX Announcement Backend-For-Frontend
