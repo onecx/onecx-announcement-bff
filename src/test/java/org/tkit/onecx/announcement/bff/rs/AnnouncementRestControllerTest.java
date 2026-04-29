@@ -41,7 +41,7 @@ class AnnouncementRestControllerTest extends AbstractTest {
     void resetExpectation() {
         try {
             mockServerClient.clear(MOCK_ID);
-        } catch (Exception ex) {
+        } catch (Exception _) {
             //  MOCK_ID not existing
         }
     }
