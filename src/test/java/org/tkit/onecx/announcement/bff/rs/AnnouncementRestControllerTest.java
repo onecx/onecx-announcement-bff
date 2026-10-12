@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
+import org.mockserver.matchers.MatchType;
 import org.mockserver.model.JsonBody;
 import org.mockserver.model.MediaType;
 import org.tkit.onecx.announcement.bff.rs.controller.AnnouncementRestController;
@@ -146,6 +147,36 @@ class AnnouncementRestControllerTest extends AbstractTest {
         Assertions.assertEquals(data.getSize(), response.getSize());
         Assertions.assertEquals(1, data.getStream().size());
         Assertions.assertEquals(data.getStream().get(0), announcement);
+    }
+
+    @Test
+    void getAnnouncements_shouldForwardAllSelectedFilters() {
+        var input = """
+                {
+                  "status": ["ACTIVE", "INACTIVE"],
+                  "type": ["EVENT", "INFO"],
+                  "priority": ["IMPORTANT", "LOW"]
+                }
+                """;
+        var serviceRequest = request().withPath(ANNOUNCEMENT_SVC_INTERNAL_API_BASE_PATH + "/search")
+                .withMethod(HttpMethod.POST)
+                .withBody(JsonBody.json(input, MatchType.ONLY_MATCHING_FIELDS));
+        mockServerClient.when(serviceRequest)
+                .withId(MOCK_ID)
+                .respond(response().withStatusCode(Response.Status.OK.getStatusCode())
+                        .withContentType(MediaType.APPLICATION_JSON)
+                        .withBody(JsonBody.json(new AnnouncementPageResult())));
+
+        given()
+                .auth().oauth2(keycloakClient.getAccessToken(ADMIN))
+                .header(APM_HEADER_PARAM, ADMIN)
+                .contentType(APPLICATION_JSON)
+                .body(input)
+                .post("/search")
+                .then()
+                .statusCode(Response.Status.OK.getStatusCode());
+
+        mockServerClient.verify(serviceRequest);
     }
 
     @Test
@@ -483,7 +514,9 @@ class AnnouncementRestControllerTest extends AbstractTest {
         data.setNumber(0);
         data.setStream(announcements);
 
-        AnnouncementSearchCriteria criteria1 = new AnnouncementSearchCriteria();
+        var criteria1 = """
+                {"status": ["ACTIVE"]}
+                """;
 
         // svc call prepare mock endpoint
         mockServerClient
