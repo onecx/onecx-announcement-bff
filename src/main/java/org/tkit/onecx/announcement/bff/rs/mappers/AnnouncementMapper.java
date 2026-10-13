@@ -9,7 +9,7 @@ import org.tkit.quarkus.rs.mappers.OffsetDateTimeMapper;
 import gen.org.tkit.onecx.announcement.bff.rs.internal.model.*;
 import gen.org.tkit.onecx.announcement.client.model.*;
 
-@Mapper(uses = { OffsetDateTimeMapper.class })
+@Mapper(uses = { OffsetDateTimeMapper.class }, imports = AnnouncementStatus.class)
 public interface AnnouncementMapper {
 
     CreateAnnouncementRequest mapCreateAnnouncement(CreateAnnouncementRequestDTO createAnnouncementRequestDTO);
@@ -26,7 +26,7 @@ public interface AnnouncementMapper {
 
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "title", ignore = true)
-    @Mapping(target = "status", constant = "ACTIVE")
+    @Mapping(target = "status", expression = "java(java.util.List.of(AnnouncementStatus.ACTIVE))")
     @Mapping(target = "startDateTo", source = "currentDate")
     @Mapping(target = "startDateFrom", ignore = true)
     @Mapping(target = "priority", ignore = true)
